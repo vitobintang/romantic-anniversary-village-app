@@ -1170,14 +1170,21 @@ body {
   position: absolute;
   z-index: 0;
   inset: 0 0 auto 0;
-  height: 4px;
+  /* The box is as tall as the card's corner radius so the rounded clip
+     follows the card's own curve exactly; only its top 4px is painted.
+     (A 4px-tall box would clamp its radius to 2px and its square ends
+     would jut out past the card's rounded corners.) The rule starts at
+     84px — 18px padding + the 68px avatar — so it never runs into her
+     frame. */
+  height: 22px;
   border-radius: 22px 22px 0 0;
-  /* starts just past the portrait (18px padding + 68px avatar) so the
-     rule never runs into her frame */
-  background: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff7aa6 40%, #ffd36e 52%, #ff7aa6 66%, #ffc2d8 100%);
+  background-image: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff7aa6 40%, #ffd36e 52%, #ff7aa6 66%, #ffc2d8 100%);
+  background-size: 100% 4px;
+  background-position: top left;
+  background-repeat: no-repeat;
 }
 .dlg.sorry::before {
-  background: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff8f9c 52%, #ffc2d8 100%);
+  background-image: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff8f9c 52%, #ffc2d8 100%);
 }
 .dlg-head {
   position: relative;
