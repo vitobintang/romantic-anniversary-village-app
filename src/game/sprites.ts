@@ -404,49 +404,56 @@ export function chickenSprite(brown: boolean, step: number): Cvs {
   });
 }
 
-/** The village cats all share one sprite — only the coat changes. */
-export interface CatPalette {
+/**
+ * Every cat in the village wears the same 12×12 cat — the one from the very
+ * first build — but each has its own coat. A coat carries up to three
+ * colours plus eyes and nose, so a cat can be bicolour (orange & white,
+ * black & white) or tricolour (white, grey & black).
+ */
+export interface CatCoat {
+  /** unique key for the sprite cache — use the cat's id */
   id: string;
-  /** main coat */
-  fur: string;
-  /** ear tips */
-  ear: string;
-  /** chest bib */
-  chest: string;
-  /** little pink nose */
-  nose: string;
+  /** main body colour */
+  base: string;
+  /** second colour — ear tips and the patches on its flanks */
+  patch: string;
+  /** optional third colour — ear tips (falls back to `patch`) */
+  spot?: string;
+  /** bib, chest and socks */
+  white: string;
+  eye: string;
+  nose?: string;
 }
-
-/** shuffled at random each time the village loads */
-export const CAT_PALETTES: CatPalette[] = [
-  { id: "ginger", fur: "#e9923a", ear: "#c9701f", chest: "#fff1dc", nose: "#ff8fa8" },
-  { id: "tabby", fur: "#a9743f", ear: "#875429", chest: "#f8ead8", nose: "#ff9fb4" },
-  { id: "tuxedo", fur: "#3f3b47", ear: "#2c2933", chest: "#f7f4ec", nose: "#ff9fb4" },
-  { id: "grey", fur: "#9aa1ad", ear: "#7b818c", chest: "#f4f2ee", nose: "#ff9fb4" },
-  { id: "cream", fur: "#f0d3ab", ear: "#d3b183", chest: "#fffaf1", nose: "#ff9fb4" },
-  { id: "calico", fur: "#e8a25c", ear: "#b9762f", chest: "#fff3e6", nose: "#ff9fb4" },
-];
 
 const CAT_ROWS = [
   "..b...b...",
-  ".bbb.bbb..",
+  ".bbd.bbd..",
   ".bbbbbbb..",
   ".bkbbbkb..",
   ".bbbpbbb..",
-  "..bbbbb...",
-  ".bbbbbbb..",
-  "bbbbbbbbb.",
-  "bbbbbbbbb.",
-  ".bbb.bbb..",
+  "..bwwwb...",
+  ".bbwwwbb..",
+  "aabwwwbaa.",
+  "bbbwwwbbb.",
+  ".bww.bww..",
 ];
 
-/** the original 12×12 village cat, unchanged apart from its palette */
-export function catSprite(pal: CatPalette): Cvs {
-  return memo(`cat:${pal.id}`, 12, 12, (g) => {
-    pmap(g, CAT_ROWS, { b: pal.fur, k: "#2b1b2e", p: pal.nose }, 1, 1);
-    R(g, pal.chest, 4, 8, 3, 2);
-    R(g, pal.ear, 3, 3, 1, 1);
-    R(g, pal.ear, 7, 3, 1, 1);
+export function catSprite(coat: CatCoat): Cvs {
+  return memo(`cat:${coat.id}`, 12, 12, (g) => {
+    pmap(
+      g,
+      CAT_ROWS,
+      {
+        b: coat.base,
+        a: coat.patch,
+        d: coat.spot ?? coat.patch,
+        w: coat.white,
+        k: coat.eye,
+        p: coat.nose ?? "#ff8fa8",
+      },
+      1,
+      1,
+    );
   });
 }
 

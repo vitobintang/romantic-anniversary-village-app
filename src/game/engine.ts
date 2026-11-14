@@ -1,6 +1,6 @@
 import { buildWorld, World, WW, WH, PEN, HouseInst } from "./world";
 import { NPCS, NpcDef, PRINCESS_LOOK, PLAYER_START, Reaction, Topic, MEMORIES, CATS, CatDef } from "./config";
-import { drawChar, Dir, chickenSprite, catSprite, CAT_PALETTES, CatPalette, doveSprite, giftBoxSprite } from "./sprites";
+import { drawChar, Dir, chickenSprite, catSprite, CatCoat, doveSprite, giftBoxSprite } from "./sprites";
 import { clamp } from "./px";
 import * as sfx from "./audio";
 
@@ -11,7 +11,7 @@ export interface DialogView {
   kind: "npc" | "cat";
   npcId: string;
   /** cat coat, so the portrait matches the cat in the world */
-  palette?: CatPalette;
+  coat?: CatCoat;
   name: string;
   title: string;
   text: string;
@@ -61,7 +61,6 @@ interface Npc {
 }
 interface Cat {
   def: CatDef;
-  pal: CatPalette;
   x: number;
   y: number;
   homeX: number;
@@ -196,16 +195,9 @@ export class Game {
       [112, 240, true],
     ];
     for (const [x, y, b] of ch) this.animals.push({ kind: "chicken", x, y, dir: 2, tx: null, ty: null, wait: Math.random() * 2, step: 0, brown: b });
-    // every cat shares one sprite; the coats are dealt out at random
-    const pals = [...CAT_PALETTES];
-    for (let i = pals.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pals[i], pals[j]] = [pals[j], pals[i]];
-    }
-    CATS.forEach((def, i) => {
+    for (const def of CATS) {
       this.cats.push({
         def,
-        pal: pals[i % pals.length],
         x: def.x,
         y: def.y,
         homeX: def.x,
@@ -217,7 +209,7 @@ export class Game {
         wait: Math.random() * 2,
         purr: Math.random() * 2,
       });
-    });
+    }
     for (let i = 0; i < 34; i++)
       this.petals.push({ x: Math.random(), y: Math.random(), s: 1.5 + Math.random() * 2, sp: 0.03 + Math.random() * 0.05, ph: Math.random() * 6, c: pick(["#ffb3cf", "#ff8fb7", "#ffd1e3", "#ffffff"]) });
     this.resize();
@@ -354,12 +346,12 @@ export class Game {
     return {
       kind: "cat",
       npcId: def.id,
-      palette: d.cat.pal,
+      coat: d.cat.def.coat,
       name: def.name,
       title: def.title,
       text: d.text,
       choices: null,
-      voice: def.kitten ? 880 : 640,
+      voice: 640,
       key: d.key,
       apology: false,
     };
@@ -374,7 +366,7 @@ export class Game {
     this.player.moving = false;
     this.tap = null;
     this.catDlg = { cat: c, queue, text: "", key: 0 };
-    sfx.blip(c.def.kitten ? 880 : 640);
+    sfx.blip(640);
     for (let i = 0; i < 7; i++) {
       this.emit("heart", c.x + (Math.random() - 0.5) * 12, c.y - 12, (Math.random() - 0.5) * 22, -14 - Math.random() * 16, 1.2, 0, pick(["pink", "red"]), 0);
     }
@@ -392,7 +384,7 @@ export class Game {
     }
     d.key++;
     d.text = line;
-    sfx.blip(d.cat.def.kitten ? 880 : 640);
+    sfx.blip(640);
     this.publish();
   }
 
@@ -659,7 +651,7 @@ export class Game {
   private findNear(): { kind: "house" | "fountain" | "cat"; label: string; house?: HouseInst; cat?: Cat } | null {
     const p = this.player;
     for (const c of this.cats) {
-      const r = c.def.kitten ? 17 : 22;
+      const r = 22;
       if (Math.hypot(p.x - c.x, p.y - c.y) < r) {
         return { kind: "cat", label: `Say hello to ${c.def.name}`, cat: c };
       }
@@ -863,7 +855,7 @@ export class Game {
     for (const c of this.cats) {
       const talking = this.catDlg?.cat === c;
       const near = Math.hypot(c.x - this.player.x, c.y - this.player.y) < 62;
-      const radius = c.def.kitten ? 9 : 20;
+      const radius = 20;
 
       // look at the Princess when she is close, or while chatting
       if (talking) {
@@ -907,8 +899,8 @@ export class Game {
   }
 
   private drawCat(g: CanvasRenderingContext2D, c: Cat, t: number) {
-    const spr = catSprite(c.pal);
-    this.shadow(g, c.x, c.y, c.def.kitten ? 0.5 : 0.85, 0.24);
+    const spr = catSprite(c.def.coat);
+    this.shadow(g, c.x, c.y, 0.85, 0.24);
 
     g.save();
     g.translate(Math.round(c.x), Math.round(c.y));
@@ -919,7 +911,7 @@ export class Game {
     // tail sway — same little two-pixel tail as the original cat
     const w = Math.sin(t * 3 + c.homeX) * 2;
     const dirk = c.dir === 3 ? -1 : 1;
-    g.fillStyle = c.pal.fur;
+    g.fillStyle = c.def.coat.base;
     g.fillRect(Math.round(c.x + dirk * 5), Math.round(c.y - 4), 3 * dirk, 1);
     g.fillRect(Math.round(c.x + dirk * 7), Math.round(c.y - 5 - w * 0.5), 1 * dirk, 2);
   }
