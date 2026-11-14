@@ -21,7 +21,7 @@
 //  becomes a plain, non-interactive cottage (world.ts keeps it as scenery,
 //  no gap in the map, no crash).
 // =====================================================================
-import type { Look, Dir } from "./sprites";
+import type { Look, Dir, CatLook } from "./sprites";
 
 export type Reaction =
   | "jump"
@@ -109,6 +109,144 @@ export const MEMORIES: Memory[] = [
     caption: "Not here yet — but already my favourite, because it's still travelling to you. When the yellow box finally lands on the doorstep, wear it once and let me say it out loud: you're the loveliest thing this month, cardigan or not.",
     photo: "/photos/memory-6.jpg",
     status: "on-the-way",
+  },
+];
+
+// ---------------------------------------------------------------------
+//  Cats of Loveberry Village
+//  The Princess can walk up to any of them and say hello — they answer in
+//  meows, purrs and the occasional hiss, with their name floating above.
+// ---------------------------------------------------------------------
+export interface CatDef {
+  id: string;
+  name: string;
+  look: CatLook;
+  x: number;
+  y: number;
+  /** what this cat says when the Princess comes to pet it */
+  cries: string[];
+  /** small line under the name */
+  blurb: string;
+}
+
+const MOCHI_LOOK: CatLook = {
+  body: "slim",
+  fur: "#f5f1ea",
+  patch: "#3c3944",
+  patch2: "#b7b2bc",
+  belly: "#ffffff",
+  eye: "#5a6472",
+};
+
+const CILA_LOOK: CatLook = {
+  body: "fat",
+  fur: "#c79a6b",
+  patch: "#fdf6ec",
+  belly: "#fffaf4",
+  eye: "#6b4a2a",
+};
+
+export const CATS: CatDef[] = [
+  {
+    id: "ciro",
+    name: "Ciro",
+    look: { body: "fat", fur: "#7d5232", patch: "#fdf7ee", belly: "#fffaf3", eye: "#2f2418" },
+    x: 300,
+    y: 470,
+    cries: ["Mrooow", "Prrrrr", "Mew?"],
+    blurb: "brown & white Persian",
+  },
+  {
+    id: "cila",
+    name: "Cila",
+    look: CILA_LOOK,
+    x: 640,
+    y: 470,
+    cries: ["Mew mew", "Prrrr", "Mrrp!"],
+    blurb: "light brown & white Persian",
+  },
+  {
+    id: "rocky",
+    name: "Rocky",
+    look: { body: "fat", fur: "#33303a", patch: "#f8f3ec", belly: "#fdf9f2", eye: "#e8c95a" },
+    x: 250,
+    y: 300,
+    cries: ["Hsss!", "Mrow", "Prrrr"],
+    blurb: "black & white, extra plump",
+  },
+  {
+    id: "momo",
+    name: "Momo",
+    look: { body: "slim", fur: "#d3a066", patch: "#b1804a", belly: "#f6e7d2", eye: "#4a3520" },
+    x: 560,
+    y: 280,
+    cries: ["Meow", "Meww", "Mrrp"],
+    blurb: "light brown, slim",
+  },
+  {
+    id: "mochi",
+    name: "Mochi",
+    look: MOCHI_LOOK,
+    x: 700,
+    y: 360,
+    cries: ["Mew?", "Mrrp", "Prrr"],
+    blurb: "white, grey & black, slim",
+  },
+  // Cila's three round kittens
+  {
+    id: "cila-k1",
+    name: "Kitten",
+    look: { ...CILA_LOOK, size: "kitten" },
+    x: 614,
+    y: 486,
+    cries: ["mew", "mew!", "prr"],
+    blurb: "one of Cila's little ones",
+  },
+  {
+    id: "cila-k2",
+    name: "Kitten",
+    look: { ...CILA_LOOK, size: "kitten", fur: "#d8ac7c" },
+    x: 666,
+    y: 484,
+    cries: ["meww", "mew", "prr"],
+    blurb: "one of Cila's little ones",
+  },
+  {
+    id: "cila-k3",
+    name: "Kitten",
+    look: { ...CILA_LOOK, size: "kitten", fur: "#b98a5d" },
+    x: 640,
+    y: 508,
+    cries: ["mew", "mrrp"],
+    blurb: "one of Cila's little ones",
+  },
+  // Mochi's three kittens
+  {
+    id: "mochi-k1",
+    name: "Kitten",
+    look: { ...MOCHI_LOOK, size: "kitten" },
+    x: 682,
+    y: 377,
+    cries: ["mew", "mew?"],
+    blurb: "one of Mochi's little ones",
+  },
+  {
+    id: "mochi-k2",
+    name: "Kitten",
+    look: { ...MOCHI_LOOK, size: "kitten", fur: "#c9c4cc", patch: "#4a4652" },
+    x: 720,
+    y: 373,
+    cries: ["meww", "prr"],
+    blurb: "one of Mochi's little ones",
+  },
+  {
+    id: "mochi-k3",
+    name: "Kitten",
+    look: { ...MOCHI_LOOK, size: "kitten", fur: "#e6dfe3", patch2: "#8f8a96" },
+    x: 700,
+    y: 392,
+    cries: ["mew", "meww"],
+    blurb: "one of Mochi's little ones",
   },
 ];
 
