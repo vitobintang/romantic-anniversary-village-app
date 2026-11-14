@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Game, UiState, DialogView } from "@/game/engine";
-import { MEMORIES, NPCS, FINALE, MONTHS } from "@/game/config";
+import { MEMORIES, NPCS, FINALE, MONTHS, COLLECTION } from "@/game/config";
 import { charSprite } from "@/game/sprites";
 import * as audio from "@/game/audio";
 
@@ -270,9 +270,17 @@ function Polaroid({ memory, count, total, onClose }: { memory: (typeof MEMORIES)
           {memory.tag} · {count}/{total}
         </div>
         <div className="photo-frame">
-          {broken ? <div className="photo-fallback">💞</div> : <img src={memory.photo} alt={memory.title} onError={() => setBroken(true)} draggable={false} />}
+          {broken ? (
+            <div className="photo-fallback">{memory.status === "on-the-way" ? "📦" : "💞"}</div>
+          ) : (
+            <img src={memory.photo} alt={memory.title} onError={() => setBroken(true)} draggable={false} />
+          )}
+          {memory.status === "on-the-way" && <div className="photo-ribbon">✈️ Still on its way</div>}
         </div>
         <h2>{memory.title}</h2>
+        <div className="brand-line">
+          {COLLECTION.brand} · {COLLECTION.label}
+        </div>
         <p>{memory.caption}</p>
         <button className="btn-pink" onClick={onClose}>
           Keep exploring ♥

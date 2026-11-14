@@ -443,6 +443,7 @@ body {
   margin: 8px 0 10px;
 }
 .photo-frame {
+  position: relative;
   background: #2a1a30;
   border-radius: 4px;
   overflow: hidden;
@@ -464,6 +465,30 @@ body {
   place-items: center;
   font-size: 64px;
   background: linear-gradient(160deg, #ffd6e6, #ffb3cf);
+}
+.photo-ribbon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 7px 10px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 800;
+  text-align: center;
+  color: #fff8e6;
+  background: linear-gradient(100deg, rgba(214, 154, 40, 0.94), rgba(236, 190, 80, 0.94));
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.25);
+}
+.brand-line {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #b0527a;
+  opacity: 0.85;
+  margin-bottom: 10px;
 }
 .polaroid h2 {
   margin: 14px 0 4px;
