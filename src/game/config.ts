@@ -4,6 +4,22 @@
 //    with your own pictures (same file names, or change `photo` below).
 //  - Change the captions / titles of the six memory houses.
 //  - Change the finale letter at the bottom.
+//
+//  This month's theme: her KUKAI cardigan collection.
+//    I   — Grey Roselle          (photo 1)
+//    II  — Pink Estelle          (photo 2)
+//    III — White Eloise          (photo 3)
+//    IV  — Emerald Estelle       (photo 4)
+//    V   — Black Camellia        (photo 5)
+//    VI  — Butter Yellow Valerie — NOT ARRIVED YET, still on its way.
+//          Photo 6 is meant to be the order screenshot. You don't have to
+//          change any code: `status: "on-the-way"` just adds the ribbon and
+//          swaps the missing-photo placeholder to a parcel.
+//
+//  ⚠️ The village has exactly six doorways in a ring around the fountain.
+//  If you ever want only five, delete a MEMORIES entry — that house simply
+//  becomes a plain, non-interactive cottage (world.ts keeps it as scenery,
+//  no gap in the map, no crash).
 // =====================================================================
 import type { Look, Dir } from "./sprites";
 
@@ -23,56 +39,65 @@ export type Reaction =
 
 export const MONTHS = 16;
 
+/** The collection these six doorways are about. */
+export const COLLECTION = {
+  brand: "KUKAI",
+  label: "this month's cardigan collection",
+};
+
 export interface Memory {
   id: "nw" | "w" | "sw" | "n" | "ne" | "e";
   title: string;
   tag: string;
   caption: string;
   photo: string;
+  /** "on-the-way" = bought, but the parcel hasn't landed yet. */
+  status?: "here" | "on-the-way";
 }
 
 export const MEMORIES: Memory[] = [
   {
     id: "nw",
-    title: "The Day We Met",
-    tag: "Memory I",
-    caption: "Some people walk into your life and quietly become your whole world. Thank you for becoming mine.",
+    title: "Grey Roselle",
+    tag: "Cardigan I",
+    caption: "The first box of the month. Grey, quiet, understated — and then you put it on and it became the prettiest thing in Loveberry. Some clothes are just lucky to be worn by you.",
     photo: "/photos/memory-1.jpg",
   },
   {
     id: "w",
-    title: "Sweet Little Moments",
-    tag: "Memory II",
-    caption: "Even the smallest, quietest moments turn into magic when I'm with you.",
+    title: "Pink Estelle",
+    tag: "Cardigan II",
+    caption: "Pink was always your colour. You walked past the fountain in it and even the flowers looked like they were taking notes.",
     photo: "/photos/memory-2.jpg",
   },
   {
     id: "sw",
-    title: "Our Adventures",
-    tag: "Memory III",
-    caption: "Anywhere is my favourite place as long as I'm holding your hand.",
+    title: "White Eloise",
+    tag: "Cardigan III",
+    caption: "White and calm, like the village on a slow morning. You make simple things look like they were made for you — because they were.",
     photo: "/photos/memory-3.jpg",
   },
   {
     id: "ne",
-    title: "Under The Stars",
-    tag: "Memory IV",
-    caption: "Out of every star in the sky, you're the one I'd wish on, every single night.",
+    title: "Emerald Estelle",
+    tag: "Cardigan IV",
+    caption: "Green like the garden after rain. I saw you in it and forgot the sentence I was halfway through saying. I still haven't remembered it.",
     photo: "/photos/memory-4.jpg",
   },
   {
     id: "e",
-    title: "Picnic Days",
-    tag: "Memory V",
-    caption: "You make ordinary days feel like holidays. I love our silly, happy little world.",
+    title: "Black Camellia",
+    tag: "Cardigan V",
+    caption: "Sleek, a little dramatic, impossible to look away from. You in black is my favourite plot twist of the month.",
     photo: "/photos/memory-5.jpg",
   },
   {
     id: "n",
-    title: "Forever Starts Here",
-    tag: "Memory VI",
-    caption: "Sixteen months down, and I'd choose you again in every lifetime. I love you, my princess.",
+    title: "Butter Yellow Valerie",
+    tag: "Cardigan VI",
+    caption: "Not here yet — but already my favourite, because it's still travelling to you. When the yellow box finally lands on the doorstep, wear it once and let me say it out loud: you're the loveliest thing this month, cardigan or not. 💛📦",
     photo: "/photos/memory-6.jpg",
+    status: "on-the-way",
   },
 ];
 
@@ -83,6 +108,7 @@ export const FINALE = {
     `${MONTHS} months ago my life got so much brighter. Every laugh, every hug, every silly little moment with you is my favourite thing in the world.`,
     "Thank you for being patient with me, for believing in me, and for loving me exactly as I am.",
     "This whole village is just a tiny piece of how much I adore you. I can't wait to build a thousand more memories with you.",
+    "Five cardigans on the shelf, one still on its way — and every single one of them is just an excuse to say it again: you're the prettiest thing in this village.",
     "Forever yours,",
     "— Your Prince 💖",
   ],
