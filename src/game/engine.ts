@@ -1,13 +1,17 @@
 import { buildWorld, World, WW, WH, PEN, HouseInst } from "./world";
 import { NPCS, NpcDef, PRINCESS_LOOK, PLAYER_START, Reaction, Topic, MEMORIES, CATS, CatDef } from "./config";
-import { drawChar, Dir, chickenSprite, catSprite, doveSprite, giftBoxSprite } from "./sprites";
+import { drawChar, Dir, chickenSprite, catSprite, CAT_PALETTES, CatPalette, doveSprite, giftBoxSprite } from "./sprites";
 import { clamp } from "./px";
 import * as sfx from "./audio";
 
 export type Phase = "title" | "intro" | "zoomout" | "play";
 
 export interface DialogView {
+  /** villagers show their character portrait, cats their little sprite */
+  kind: "npc" | "cat";
   npcId: string;
+  /** cat coat, so the portrait matches the cat in the world */
+  palette?: CatPalette;
   name: string;
   title: string;
   text: string;
@@ -57,6 +61,7 @@ interface Npc {
 }
 interface Cat {
   def: CatDef;
+  pal: CatPalette;
   x: number;
   y: number;
   homeX: number;
@@ -66,8 +71,15 @@ interface Cat {
   tx: number | null;
   ty: number | null;
   wait: number;
-  say: { text: string; t: number } | null;
   purr: number;
+}
+
+/** a cat conversation — same dialogue box as the villagers, all meows */
+interface CatDialog {
+  cat: Cat;
+  queue: string[];
+  text: string;
+  key: number;
 }
 interface Animal {
   kind: "chicken" | "cat";
@@ -143,6 +155,7 @@ export class Game {
   private joy = { id: -1, active: false, ox: 0, oy: 0, vx: 0, vy: 0, sx: 0, sy: 0, st: 0 };
   private tap: { x: number; y: number; t: number; stuck: number } | null = null;
   private dlg: { npc: Npc; queue: Line[]; seen: Set<number>; intro: boolean; choosing: boolean; text: string; key: number } | null = null;
+  private catDlg: CatDialog | null = null;
   private ui: UiState;
   private vignette: CanvasGradient | null = null;
   private smokeT = 0;
@@ -183,9 +196,16 @@ export class Game {
       [112, 240, true],
     ];
     for (const [x, y, b] of ch) this.animals.push({ kind: "chicken", x, y, dir: 2, tx: null, ty: null, wait: Math.random() * 2, step: 0, brown: b });
-    for (const def of CATS) {
+    // every cat shares one sprite; the coats are dealt out at random
+    const pals = [...CAT_PALETTES];
+    for (let i = pals.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pals[i], pals[j]] = [pals[j], pals[i]];
+    }
+    CATS.forEach((def, i) => {
       this.cats.push({
         def,
+        pal: pals[i % pals.length],
         x: def.x,
         y: def.y,
         homeX: def.x,
@@ -195,10 +215,9 @@ export class Game {
         tx: null,
         ty: null,
         wait: Math.random() * 2,
-        say: null,
         purr: Math.random() * 2,
       });
-    }
+    });
     for (let i = 0; i < 34; i++)
       this.petals.push({ x: Math.random(), y: Math.random(), s: 1.5 + Math.random() * 2, sp: 0.03 + Math.random() * 0.05, ph: Math.random() * 6, c: pick(["#ffb3cf", "#ff8fb7", "#ffd1e3", "#ffffff"]) });
     this.resize();
@@ -225,6 +244,10 @@ export class Game {
   }
 
   next() {
+    if (this.catDlg) {
+      this.advanceCat();
+      return;
+    }
     if (!this.dlg || this.dlg.choosing) return;
     this.advance();
   }
@@ -259,15 +282,7 @@ export class Game {
       for (let i = 0; i < 14; i++) this.emit("heart", n.house.x + (Math.random() - 0.5) * 30, n.house.y - 20, (Math.random() - 0.5) * 30, -20 - Math.random() * 30, 1.6, 0, pick(["red", "pink", "gold"]), -4);
       this.publish();
     } else if (n.kind === "cat" && n.cat) {
-      const cat = n.cat;
-      const cry = cat.def.cries[Math.floor(Math.random() * cat.def.cries.length)];
-      cat.say = { text: cry, t: 2.8 };
-      cat.dir = cat.x > this.player.x ? 2 : 3;
-      sfx.blip(cat.def.look.size === "kitten" ? 880 : 640);
-      for (let i = 0; i < 7; i++) {
-        this.emit("heart", cat.x + (Math.random() - 0.5) * 12, cat.y - 12, (Math.random() - 0.5) * 22, -14 - Math.random() * 16, 1.2, 0, pick(["pink", "red"]), 0);
-      }
-      this.publish();
+      this.startCatDialog(n.cat);
     } else if (n.kind === "fountain") {
       if (this.ui.opened.length >= this.ui.total) {
         this.ui.finale = true;
@@ -306,11 +321,11 @@ export class Game {
 
   // ------------------------------------------------------------ internals
   private modal() {
-    return !!this.dlg || !!this.ui.photo || this.ui.finale;
+    return !!this.dlg || !!this.catDlg || !!this.ui.photo || this.ui.finale;
   }
   private publish() {
     this.ui.phase = this.phase;
-    this.ui.dialog = this.dlg ? this.dialogView() : null;
+    this.ui.dialog = this.dlg ? this.dialogView() : this.catDlg ? this.catDialogView() : null;
     this.cb({ ...this.ui });
   }
   private toast(text: string) {
@@ -321,6 +336,7 @@ export class Game {
     const d = this.dlg!;
     const def = d.npc.def;
     return {
+      kind: "npc",
       npcId: def.id,
       name: def.name,
       title: def.title,
@@ -330,6 +346,54 @@ export class Game {
       key: d.key,
       apology: !!def.decorator,
     };
+  }
+
+  private catDialogView(): DialogView {
+    const d = this.catDlg!;
+    const def = d.cat.def;
+    return {
+      kind: "cat",
+      npcId: def.id,
+      palette: d.cat.pal,
+      name: def.name,
+      title: def.title,
+      text: d.text,
+      choices: null,
+      voice: def.kitten ? 880 : 640,
+      key: d.key,
+      apology: false,
+    };
+  }
+
+  /** cats get the very same dialogue box the villagers use */
+  private startCatDialog(c: Cat) {
+    const cries = [...c.def.cries];
+    const queue = [cries[0], cries[1] ?? cries[0]];
+    c.dir = c.x > this.player.x ? 2 : 3;
+    this.player.dir = dirOf(c.x - this.player.x, c.y - this.player.y);
+    this.player.moving = false;
+    this.tap = null;
+    this.catDlg = { cat: c, queue, text: "", key: 0 };
+    sfx.blip(c.def.kitten ? 880 : 640);
+    for (let i = 0; i < 7; i++) {
+      this.emit("heart", c.x + (Math.random() - 0.5) * 12, c.y - 12, (Math.random() - 0.5) * 22, -14 - Math.random() * 16, 1.2, 0, pick(["pink", "red"]), 0);
+    }
+    this.advanceCat();
+  }
+
+  private advanceCat() {
+    const d = this.catDlg;
+    if (!d) return;
+    const line = d.queue.shift();
+    if (!line) {
+      this.catDlg = null;
+      this.publish();
+      return;
+    }
+    d.key++;
+    d.text = line;
+    sfx.blip(d.cat.def.kitten ? 880 : 640);
+    this.publish();
   }
 
   private startDialog(n: Npc, intro: boolean) {
@@ -595,10 +659,9 @@ export class Game {
   private findNear(): { kind: "house" | "fountain" | "cat"; label: string; house?: HouseInst; cat?: Cat } | null {
     const p = this.player;
     for (const c of this.cats) {
-      const r = c.def.look.size === "kitten" ? 17 : 22;
+      const r = c.def.kitten ? 17 : 22;
       if (Math.hypot(p.x - c.x, p.y - c.y) < r) {
-        const name = c.def.look.size === "kitten" ? "the kitten" : c.def.name;
-        return { kind: "cat", label: `Say hello to ${name}`, cat: c };
+        return { kind: "cat", label: `Say hello to ${c.def.name}`, cat: c };
       }
     }
     for (const h of this.world.houses) {
@@ -798,18 +861,17 @@ export class Game {
 
   private updateCats(dt: number) {
     for (const c of this.cats) {
-      const kitten = c.def.look.size === "kitten";
+      const talking = this.catDlg?.cat === c;
       const near = Math.hypot(c.x - this.player.x, c.y - this.player.y) < 62;
+      const radius = c.def.kitten ? 9 : 20;
 
-      if (c.say) {
-        c.say.t -= dt;
-        if (c.say.t <= 0) c.say = null;
+      // look at the Princess when she is close, or while chatting
+      if (talking) {
+        c.dir = this.player.x < c.x ? 2 : 3;
+        continue;
       }
-
-      // look at the Princess when she comes close
       if (near) c.dir = this.player.x < c.x ? 2 : 3;
 
-      const radius = kitten ? 9 : 20;
       if (c.tx === null || c.ty === null) {
         c.wait -= dt;
         if (c.wait <= 0) {
@@ -825,7 +887,7 @@ export class Game {
           c.tx = null;
           c.ty = null;
         } else {
-          const sp = (kitten ? 9 : 6) * dt;
+          const sp = 6 * dt;
           c.x += (dx / dist) * sp;
           c.y += (dy / dist) * sp;
           c.step += sp * 2.4;
@@ -845,10 +907,8 @@ export class Game {
   }
 
   private drawCat(g: CanvasRenderingContext2D, c: Cat, t: number) {
-    const kitten = c.def.look.size === "kitten";
-    const frame = Math.floor(c.step / 6) % 2;
-    const spr = catSprite(c.def.look, frame);
-    this.shadow(g, c.x, c.y, kitten ? 0.45 : 0.85, 0.24);
+    const spr = catSprite(c.pal);
+    this.shadow(g, c.x, c.y, c.def.kitten ? 0.5 : 0.85, 0.24);
 
     g.save();
     g.translate(Math.round(c.x), Math.round(c.y));
@@ -856,17 +916,12 @@ export class Game {
     g.drawImage(spr, -Math.round(spr.width / 2), -spr.height + 2);
     g.restore();
 
-    // tail sway
-    const sway = Math.sin(t * 2.4 + c.homeX) * 1.5;
-    g.fillStyle = c.def.look.patch;
-    g.fillRect(Math.round(c.x - (kitten ? 4 : 7) + sway), Math.round(c.y - (kitten ? 5 : 7)), 1, 1);
-
-    if (c.say) {
-      const a = Math.min(1, c.say.t / 0.45);
-      this.tag(g, `${c.def.name}: ${c.say.text}`, c.x, c.y - spr.height - 6, a);
-    } else if (Math.hypot(c.x - this.player.x, c.y - this.player.y) < 62) {
-      this.tag(g, c.def.name, c.x, c.y - spr.height - 5, 0.9);
-    }
+    // tail sway — same little two-pixel tail as the original cat
+    const w = Math.sin(t * 3 + c.homeX) * 2;
+    const dirk = c.dir === 3 ? -1 : 1;
+    g.fillStyle = c.pal.fur;
+    g.fillRect(Math.round(c.x + dirk * 5), Math.round(c.y - 4), 3 * dirk, 1);
+    g.fillRect(Math.round(c.x + dirk * 7), Math.round(c.y - 5 - w * 0.5), 1 * dirk, 2);
   }
 
   private updateParticles(dt: number) {
@@ -922,6 +977,14 @@ export class Game {
       ty = (n.y + p.y) / 2 - 8;
       tz = this.dlg.intro ? Math.min(rz * 2.2, 7.5) : Math.min(rz * 1.55, 6);
       tf = 0.34;
+      kp = 3;
+      kz = 2.4;
+    } else if (this.catDlg) {
+      const c = this.catDlg.cat;
+      tx = (c.x + p.x) / 2;
+      ty = (c.y + p.y) / 2 - 4;
+      tz = Math.min(rz * 1.7, 6.4);
+      tf = 0.38;
       kp = 3;
       kz = 2.4;
     } else if (this.phase === "intro") {
@@ -1312,8 +1375,16 @@ export class Game {
     }
     g.globalAlpha = 1;
 
-    // name tags
-    if (this.phase === "play" && !this.dlg) {
+    // name tags — cats use the very same tag as the villagers
+    if (this.catDlg) {
+      const c = this.catDlg.cat;
+      this.tag(g, `${c.def.name} · ${c.def.title}`, (c.x - v.ox) * z, (c.y - 17 - v.oy) * z, 1);
+    } else if (this.dlg) {
+      const n = this.dlg.npc;
+      const sx = (n.x - v.ox) * z;
+      const sy = (n.y - 42 * (n.def.look.scale ?? 1) - v.oy) * z;
+      this.tag(g, `${n.def.name} · ${n.def.title}`, sx, sy, 1);
+    } else if (this.phase === "play") {
       for (const n of this.npcs) {
         const d = Math.hypot(n.x - p.x, n.y - p.y);
         if (d > 80) continue;
@@ -1321,11 +1392,13 @@ export class Game {
         const sy = (n.y - 40 * (n.def.look.scale ?? 1) - v.oy) * z;
         this.tag(g, n.def.name, sx, sy, Math.min(1, (80 - d) / 30));
       }
-    } else if (this.dlg) {
-      const n = this.dlg.npc;
-      const sx = (n.x - v.ox) * z;
-      const sy = (n.y - 42 * (n.def.look.scale ?? 1) - v.oy) * z;
-      this.tag(g, `${n.def.name} · ${n.def.title}`, sx, sy, 1);
+      for (const c of this.cats) {
+        const d = Math.hypot(c.x - p.x, c.y - p.y);
+        if (d > 80) continue;
+        const sx = (c.x - v.ox) * z;
+        const sy = (c.y - 17 - v.oy) * z;
+        this.tag(g, c.def.name, sx, sy, Math.min(1, (80 - d) / 30));
+      }
     }
 
     // joystick
