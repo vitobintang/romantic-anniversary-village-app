@@ -251,21 +251,39 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
   const [n, setN] = useState(0);
   const len = d.text.length;
   const done = n >= len;
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopTyping = useCallback(() => {
+    if (timer.current !== null) {
+      clearInterval(timer.current);
+      timer.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     setN(0);
+    stopTyping();
     let i = 0;
-    const id = setInterval(() => {
+    timer.current = setInterval(() => {
       i++;
       setN(i);
       if (i % 2 === 0) audio.blip(d.voice);
-      if (i >= d.text.length) clearInterval(id);
+      if (i >= d.text.length) {
+        clearInterval(timer.current!);
+        timer.current = null;
+      }
     }, 26);
-    return () => clearInterval(id);
-  }, [d.text, d.voice]);
+    return stopTyping;
+  }, [d.text, d.voice, stopTyping]);
+
+  /** tap mid-sentence: stop the typewriter and show the whole line */
+  const skip = () => {
+    stopTyping();
+    setN(len);
+  };
 
   const click = () => {
-    if (!done) setN(len);
+    if (!done) skip();
     else if (!d.choices) onNext();
   };
 
@@ -273,7 +291,7 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        if (!done) setN(len);
+        if (!done) skip();
         else if (!d.choices) onNext();
       }
       if (d.choices && done) {
@@ -287,7 +305,7 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
 
   return (
     <div className="dlg-wrap">
-      <div className={`dlg ${d.apology ? "sorry" : ""}`}>
+      <div className={`dlg ${d.apology ? "sorry" : ""}`} onClick={click}>
         <div className="dlg-head">
           <div className={`portrait-frame ${!done ? "talk" : ""}`}>
             <Portrait d={d} />
@@ -297,7 +315,7 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
             <span>{d.title}</span>
           </div>
         </div>
-        <div className="dlg-text" onClick={click}>
+        <div className="dlg-text">
           <p className="dlg-line">
             {d.text.slice(0, n)}
             {!done && <span className="caret" />}
