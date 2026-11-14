@@ -273,7 +273,13 @@ function Polaroid({ memory, count, total, onClose }: { memory: (typeof MEMORIES)
           {broken ? (
             <div className="photo-fallback">{memory.status === "on-the-way" ? "📦" : "💞"}</div>
           ) : (
-            <img src={memory.photo} alt={memory.title} onError={() => setBroken(true)} draggable={false} />
+            <img
+              src={memory.photo}
+              alt={memory.title}
+              onError={() => setBroken(true)}
+              draggable={false}
+              style={memory.focus ? { objectPosition: memory.focus } : undefined}
+            />
           )}
           {memory.status === "on-the-way" && <div className="photo-ribbon">✈️ Still on its way</div>}
         </div>
