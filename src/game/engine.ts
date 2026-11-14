@@ -966,9 +966,12 @@ export class Game {
     if (this.dlg) {
       const n = this.dlg.npc;
       tx = (n.x + p.x) / 2;
-      ty = (n.y + p.y) / 2 - 8;
+      ty = (n.y + p.y) / 2 - 6;
       tz = this.dlg.intro ? Math.min(rz * 2.2, 7.5) : Math.min(rz * 1.55, 6);
-      tf = 0.34;
+      // 0.5 keeps the middle of the pair dead centre, so the Herald is not
+      // squashed against the top of the screen (his confetti used to fly
+      // straight off-screen)
+      tf = 0.5;
       kp = 3;
       kz = 2.4;
     } else if (this.catDlg) {
@@ -976,14 +979,14 @@ export class Game {
       tx = (c.x + p.x) / 2;
       ty = (c.y + p.y) / 2 - 4;
       tz = Math.min(rz * 1.7, 6.4);
-      tf = 0.38;
+      tf = 0.5;
       kp = 3;
       kz = 2.4;
     } else if (this.phase === "intro") {
       tx = pip.x;
-      ty = (pip.y + p.y) / 2 - 8;
+      ty = (pip.y + p.y) / 2 - 6;
       tz = Math.min(rz * 2.2, 7.5);
-      tf = 0.34;
+      tf = 0.5;
       kp = 3;
       kz = 2.4;
     } else if (this.phase === "zoomout") {
