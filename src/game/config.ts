@@ -21,7 +21,7 @@
 //  becomes a plain, non-interactive cottage (world.ts keeps it as scenery,
 //  no gap in the map, no crash).
 // =====================================================================
-import type { Look, Dir } from "./sprites";
+import type { Look, Dir, CatCoat } from "./sprites";
 
 export type Reaction =
   | "jump"
@@ -114,10 +114,9 @@ export const MEMORIES: Memory[] = [
 
 // ---------------------------------------------------------------------
 //  Cats of Loveberry Village
-//  Every cat uses the very same little orange-cat sprite from the first
-//  version of the village — only the coat colours are shuffled at random
-//  so no two cats look alike. Say hello and they answer in a proper
-//  dialogue box, in meows, purrs and the occasional hiss.
+//  Five cats, each with its own coat — two or three colours apiece, so
+//  nobody is a flat blob. They answer in a proper dialogue box, in meows,
+//  purrs and the occasional hiss.
 // ---------------------------------------------------------------------
 export interface CatDef {
   id: string;
@@ -128,8 +127,8 @@ export interface CatDef {
   y: number;
   /** what this cat says when the Princess comes to say hello */
   cries: string[];
-  /** kittens wander a shorter leash around their home spot */
-  kitten?: boolean;
+  /** base + patch + white (+ optional third colour) */
+  coat: CatCoat;
 }
 
 export const CATS: CatDef[] = [
@@ -140,22 +139,46 @@ export const CATS: CatDef[] = [
     x: 300,
     y: 470,
     cries: ["Mrrrow", "Prrrrr", "Mew?"],
+    // light orange & white
+    coat: {
+      id: "ciro",
+      base: "#f7b06a",
+      patch: "#e08a3c",
+      white: "#fff8ee",
+      eye: "#4a3222",
+    },
   },
   {
     id: "cila",
     name: "Cila",
-    title: "Mother of three",
+    title: "Village cat",
     x: 640,
     y: 470,
     cries: ["Mew mew", "Prrrr", "Mrrp!"],
+    // light brown & white
+    coat: {
+      id: "cila",
+      base: "#eed0a8",
+      patch: "#d9aa79",
+      white: "#fffaf3",
+      eye: "#5a4330",
+    },
   },
   {
     id: "rocky",
-    name: "Rocky",
+    name: "Rocky (dombel/tompel)",
     title: "Village cat",
     x: 250,
     y: 300,
     cries: ["Hsss!", "Mrow", "Prrrr"],
+    // black & white, with amber eyes
+    coat: {
+      id: "rocky",
+      base: "#3c3944",
+      patch: "#2a2732",
+      white: "#f9f5ee",
+      eye: "#f2c14e",
+    },
   },
   {
     id: "momo",
@@ -164,23 +187,32 @@ export const CATS: CatDef[] = [
     x: 560,
     y: 280,
     cries: ["Meow", "Meww", "Mrrp"],
+    // light brown, with a toffee saddle
+    coat: {
+      id: "momo",
+      base: "#e9bb7c",
+      patch: "#bf8c4c",
+      white: "#fdf4e6",
+      eye: "#4a3222",
+    },
   },
   {
     id: "mochi",
     name: "Mochi",
-    title: "Mother of three",
+    title: "Village cat",
     x: 700,
     y: 360,
     cries: ["Mew?", "Mrrp", "Prrr"],
+    // white, grey & black — three colours
+    coat: {
+      id: "mochi",
+      base: "#fbf7ef",
+      patch: "#b9b3bd",
+      spot: "#302c37",
+      white: "#ffffff",
+      eye: "#3a3442",
+    },
   },
-  // Cila's three kittens
-  { id: "cila-k1", name: "Kitten", title: "Cila's kitten", x: 614, y: 486, cries: ["mew", "mew!", "prr"], kitten: true },
-  { id: "cila-k2", name: "Kitten", title: "Cila's kitten", x: 666, y: 484, cries: ["meww", "mew", "prr"], kitten: true },
-  { id: "cila-k3", name: "Kitten", title: "Cila's kitten", x: 640, y: 508, cries: ["mew", "mrrp"], kitten: true },
-  // Mochi's three kittens
-  { id: "mochi-k1", name: "Kitten", title: "Mochi's kitten", x: 682, y: 377, cries: ["mew", "mew?"], kitten: true },
-  { id: "mochi-k2", name: "Kitten", title: "Mochi's kitten", x: 720, y: 373, cries: ["meww", "prr"], kitten: true },
-  { id: "mochi-k3", name: "Kitten", title: "Mochi's kitten", x: 700, y: 392, cries: ["mew", "meww"], kitten: true },
 ];
 
 export const FINALE = {

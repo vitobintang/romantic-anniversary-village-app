@@ -227,11 +227,11 @@ function Portrait({ d }: { d: DialogView }) {
     if (!c) return;
     const g = c.getContext("2d")!;
     g.imageSmoothingEnabled = false;
-    if (d.kind === "cat" && d.palette) {
+    if (d.kind === "cat" && d.coat) {
       const size = 70;
       c.width = size;
       c.height = size;
-      const spr = catSprite(d.palette);
+      const spr = catSprite(d.coat);
       g.clearRect(0, 0, size, size);
       g.drawImage(spr, 0, 0, spr.width, spr.height, 0, 0, size, size);
       return;
