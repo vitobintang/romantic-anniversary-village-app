@@ -24,7 +24,7 @@ import NumberFlow from "@number-flow/react";
 import { Toaster, toast as notify } from "sonner";
 import { Game, UiState, DialogView } from "@/game/engine";
 import { MEMORIES, NPCS, FINALE, MONTHS, COLLECTION } from "@/game/config";
-import { charSprite } from "@/game/sprites";
+import { catSprite, charSprite } from "@/game/sprites";
 import * as audio from "@/game/audio";
 
 const EMPTY: UiState = {
@@ -220,18 +220,30 @@ function TitleScreen({ ready, onStart }: { ready: boolean; onStart: () => void }
   );
 }
 
-function Portrait({ id }: { id: string }) {
+function Portrait({ d }: { d: DialogView }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;
-    const def = NPCS.find((n) => n.id === id);
-    if (!c || !def) return;
+    if (!c) return;
     const g = c.getContext("2d")!;
     g.imageSmoothingEnabled = false;
+    if (d.kind === "cat" && d.palette) {
+      const size = 70;
+      c.width = size;
+      c.height = size;
+      const spr = catSprite(d.palette);
+      g.clearRect(0, 0, size, size);
+      g.drawImage(spr, 0, 0, spr.width, spr.height, 0, 0, size, size);
+      return;
+    }
+    const def = NPCS.find((n) => n.id === d.npcId);
+    if (!def) return;
+    c.width = 24;
+    c.height = 24;
     g.clearRect(0, 0, c.width, c.height);
     const spr = charSprite(def.look, 0, 0, 0, 0);
     g.drawImage(spr, 0, 0, 24, 24, 0, 0, 24, 24);
-  }, [id]);
+  }, [d]);
   return <canvas ref={ref} width={24} height={24} className="portrait" />;
 }
 
@@ -278,7 +290,7 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
       <div className={`dlg ${d.apology ? "sorry" : ""}`}>
         <div className="dlg-head">
           <div className={`portrait-frame ${!done ? "talk" : ""}`}>
-            <Portrait id={d.npcId} />
+            <Portrait d={d} />
           </div>
           <div className="dlg-name">
             <b>{d.name}</b>
