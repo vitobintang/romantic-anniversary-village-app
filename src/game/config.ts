@@ -53,6 +53,12 @@ export interface Memory {
   photo: string;
   /** "on-the-way" = bought, but the parcel hasn't landed yet. */
   status?: "here" | "on-the-way";
+  /**
+   * CSS object-position for the 4:5 polaroid frame. Phone shots are much
+   * taller than 4:5, so `cover` trims the top/bottom — nudge this upward
+   * (e.g. "center 30%") to keep her head and the cardigan in the frame.
+   */
+  focus?: string;
 }
 
 export const MEMORIES: Memory[] = [
@@ -62,6 +68,7 @@ export const MEMORIES: Memory[] = [
     tag: "Cardigan I",
     caption: "The first box of the month. Grey, quiet, understated — and then you put it on and it became the prettiest thing in Loveberry. Some clothes are just lucky to be worn by you.",
     photo: "/photos/memory-1.jpg",
+    focus: "center 45%",
   },
   {
     id: "w",
@@ -69,6 +76,7 @@ export const MEMORIES: Memory[] = [
     tag: "Cardigan II",
     caption: "Pink was always your colour. You walked past the fountain in it and even the flowers looked like they were taking notes.",
     photo: "/photos/memory-2.jpg",
+    focus: "center 35%",
   },
   {
     id: "sw",
@@ -76,6 +84,7 @@ export const MEMORIES: Memory[] = [
     tag: "Cardigan III",
     caption: "White and calm, like the village on a slow morning. You make simple things look like they were made for you — because they were.",
     photo: "/photos/memory-3.jpg",
+    focus: "center 28%",
   },
   {
     id: "ne",
@@ -83,6 +92,7 @@ export const MEMORIES: Memory[] = [
     tag: "Cardigan IV",
     caption: "Green like the garden after rain. I saw you in it and forgot the sentence I was halfway through saying. I still haven't remembered it.",
     photo: "/photos/memory-4.jpg",
+    focus: "center 31%",
   },
   {
     id: "e",
@@ -90,6 +100,7 @@ export const MEMORIES: Memory[] = [
     tag: "Cardigan V",
     caption: "Sleek, a little dramatic, impossible to look away from. You in black is my favourite plot twist of the month.",
     photo: "/photos/memory-5.jpg",
+    focus: "center 28%",
   },
   {
     id: "n",
