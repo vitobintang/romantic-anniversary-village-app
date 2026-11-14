@@ -1,6 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Compass,
+  Flower2,
+  Gift,
+  Heart,
+  HeartHandshake,
+  MessageCircle,
+  Music2,
+  Package,
+  Plane,
+  Sparkles,
+  Volume2,
+  VolumeX,
+  X,
+} from "lucide-react";
+import NumberFlow from "@number-flow/react";
+import { Toaster, toast as notify } from "sonner";
 import { Game, UiState, DialogView } from "@/game/engine";
 import { MEMORIES, NPCS, FINALE, MONTHS, COLLECTION } from "@/game/config";
 import { charSprite } from "@/game/sprites";
@@ -24,7 +44,6 @@ export default function GameApp() {
   const [ready, setReady] = useState(false);
   const [muted, setMuted] = useState(false);
   const [hint, setHint] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -52,9 +71,12 @@ export default function GameApp() {
 
   useEffect(() => {
     if (!ui.toast) return;
-    setToast(ui.toast.text);
-    const t = setTimeout(() => setToast(null), 4200);
-    return () => clearTimeout(t);
+    notify(ui.toast.text, {
+      id: `toast-${ui.toast.id}`,
+      icon: <Sparkles size={16} strokeWidth={2.5} />,
+      duration: 4200,
+      className: "village-toast",
+    });
   }, [ui.toast?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const begin = useCallback(() => {
@@ -73,6 +95,12 @@ export default function GameApp() {
   return (
     <div className="game-root">
       <canvas ref={canvasRef} className="game-canvas" />
+      <Toaster
+        position="top-center"
+        offset={76}
+        gap={8}
+        toastOptions={{ unstyled: false, className: "village-toast" }}
+      />
 
       {ui.phase === "title" && <TitleScreen ready={ready} onStart={begin} />}
 
@@ -80,8 +108,8 @@ export default function GameApp() {
         <div className="hud">
           <div className="hud-top">
             <div className="chip">
-              <span className="chip-heart">♥</span>
-              <span>
+              <Heart className="chip-heart" size={14} strokeWidth={0} fill="currentColor" />
+              <span className="chip-count">
                 {ui.opened.length}/{ui.total}
               </span>
               <span className="chip-dots">
@@ -91,19 +119,22 @@ export default function GameApp() {
               </span>
             </div>
             <button className="chip round" onClick={toggleMute} aria-label="toggle sound">
-              {muted ? "🔇" : "🎵"}
+              {muted ? <VolumeX size={18} /> : <Music2 size={18} />}
             </button>
           </div>
 
           {hint && ui.phase === "play" && !ui.dialog && !ui.photo && (
-            <div className="hint">Drag anywhere to walk · tap to travel · bump into villagers to chat 💬</div>
+            <div className="hint">
+              <MessageCircle size={14} />
+              <span>Drag to walk · tap to travel · bump into villagers to chat</span>
+            </div>
           )}
 
-          {toast && !ui.photo && !ui.finale && <div className="toast">{toast}</div>}
 
           {ui.near && !ui.dialog && !ui.photo && !ui.finale && (
             <button className="action" onClick={() => gameRef.current?.interact()}>
-              {ui.near.label}
+              {ui.near.label.toLowerCase().includes("memory") ? <Gift size={18} /> : ui.near.label.toLowerCase().includes("talk") ? <MessageCircle size={18} /> : <ArrowRight size={18} />}
+              <span>{ui.near.label}</span>
             </button>
           )}
         </div>
@@ -140,20 +171,36 @@ function TitleScreen({ ready, onStart }: { ready: boolean; onStart: () => void }
     <div className="title">
       <div className="floaters">
         {hearts.map((h, i) => (
-          <span key={i} style={{ left: `${h.left}%`, animationDelay: `${h.delay}s`, animationDuration: `${h.dur}s`, fontSize: h.size }}>
-            {i % 3 === 0 ? "💗" : i % 3 === 1 ? "🌸" : "💕"}
+          <span key={i} style={{ left: `${h.left}%`, animationDelay: `${h.delay}s`, animationDuration: `${h.dur}s` }}>
+            {i % 3 === 0 ? (
+              <Heart size={h.size} strokeWidth={0} fill="currentColor" />
+            ) : i % 3 === 1 ? (
+              <Flower2 size={h.size} strokeWidth={1.6} />
+            ) : (
+              <Sparkles size={h.size} strokeWidth={1.6} />
+            )}
           </span>
         ))}
       </div>
       <div className="title-card">
-        <div className="title-eyebrow">✦ A little village made with love ✦</div>
-        <div className="title-num">{MONTHS}</div>
+        <div className="title-eyebrow">
+          <Sparkles size={12} strokeWidth={2.5} />
+          <span>A little village made with love</span>
+          <Sparkles size={12} strokeWidth={2.5} />
+        </div>
+        <div className="title-num">
+          <NumberFlow value={MONTHS} />
+        </div>
         <div className="title-sub">Monthversary</div>
         <p className="title-copy">For my Princess. Come visit Loveberry Village. Everyone has been waiting for you.</p>
         <button className="title-btn" disabled={!ready} onClick={onStart}>
-          {ready ? "Enter the Village ♥" : "Gathering petals…"}
+          <span>{ready ? "Enter the Village" : "Gathering petals…"}</span>
+          <ArrowRight size={18} strokeWidth={2.75} />
         </button>
-        <div className="title-note">🔊 Sound on for the full experience</div>
+        <div className="title-note">
+          <Volume2 size={12} />
+          <span>Sound on for the full experience</span>
+        </div>
       </div>
     </div>
   );
@@ -227,16 +274,28 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
         <div className="dlg-text" onClick={click}>
           {d.text.slice(0, n)}
           {!done && <span className="caret" />}
-          {done && !d.choices && <span className="next">Next ▶</span>}
+          {done && !d.choices && (
+            <span className="next">
+              Next
+              <ArrowRight size={13} strokeWidth={3} />
+            </span>
+          )}
         </div>
         {d.choices && done && (
           <div className="choices">
-            <div className="choices-label">What would you like to say?</div>
+            <div className="choices-label">
+              <MessageCircle size={12} strokeWidth={2.5} />
+              <span>What would you like to say?</span>
+            </div>
             {d.choices.map((c, i) => (
               <button key={i} className={`choice ${i === d.choices!.length - 1 ? "exit" : ""}`} style={{ animationDelay: `${i * 70}ms` }} onClick={() => onChoose(i)}>
                 <i>{i + 1}</i>
                 <span>{c.label}</span>
-                {c.seen && <em>♥</em>}
+                {c.seen && (
+                  <em>
+                    <Check size={15} strokeWidth={3.5} />
+                  </em>
+                )}
               </button>
             ))}
           </div>
@@ -266,12 +325,21 @@ function Polaroid({ memory, count, total, onClose }: { memory: (typeof MEMORIES)
       </div>
       <div className="polaroid" onClick={(e) => e.stopPropagation()}>
         <div className="tape" />
+        <button className="polaroid-close" onClick={onClose} aria-label="Close memory">
+          <X size={16} strokeWidth={2.75} />
+        </button>
         <div className="polaroid-tag">
-          {memory.tag} · {count}/{total}
+          <span>{memory.tag}</span>
+          <span className="tag-divider" />
+          <span>
+            {count}/{total}
+          </span>
         </div>
         <div className="photo-frame">
           {broken ? (
-            <div className="photo-fallback">{memory.status === "on-the-way" ? "📦" : "💞"}</div>
+            <div className="photo-fallback">
+              {memory.status === "on-the-way" ? <Package size={44} strokeWidth={1.5} /> : <HeartHandshake size={44} strokeWidth={1.5} />}
+            </div>
           ) : (
             <img
               src={memory.photo}
@@ -281,7 +349,12 @@ function Polaroid({ memory, count, total, onClose }: { memory: (typeof MEMORIES)
               style={memory.focus ? { objectPosition: memory.focus } : undefined}
             />
           )}
-          {memory.status === "on-the-way" && <div className="photo-ribbon">✈️ Still on its way</div>}
+          {memory.status === "on-the-way" && (
+            <div className="photo-ribbon">
+              <Plane size={13} strokeWidth={2.5} />
+              <span>Still on its way</span>
+            </div>
+          )}
         </div>
         <h2>{memory.title}</h2>
         <div className="brand-line">
@@ -289,7 +362,8 @@ function Polaroid({ memory, count, total, onClose }: { memory: (typeof MEMORIES)
         </div>
         <p>{memory.caption}</p>
         <button className="btn-pink" onClick={onClose}>
-          Keep exploring ♥
+          <span>Keep exploring</span>
+          <Compass size={16} strokeWidth={2.5} />
         </button>
       </div>
     </div>
@@ -373,17 +447,31 @@ function Finale({ onClose }: { onClose: () => void }) {
     <div className="finale">
       <canvas ref={ref} className="finale-fx" />
       <div className="finale-card">
-        <div className="finale-num">{MONTHS}</div>
+        <div className="finale-halo" aria-hidden />
+        <div className="finale-seal">
+          <Heart size={20} strokeWidth={0} fill="currentColor" />
+        </div>
+        <div className="finale-num">
+          <NumberFlow value={MONTHS} />
+        </div>
         <h2>{FINALE.title}</h2>
         <div className="letter">
+          <span className="letter-rule" aria-hidden />
           {FINALE.letter.map((l, i) => (
-            <p key={i} style={{ animationDelay: `${0.6 + i * 1.1}s` }}>
-              {l}
+            <p
+              key={i}
+              className={l.startsWith("—") ? "signature" : l.endsWith(",") && l.split(" ").length <= 3 ? "salutation" : undefined}
+              style={{ animationDelay: `${0.6 + i * 1.1}s` }}
+            >
+              {l.startsWith("—") ? <Heart size={14} strokeWidth={0} fill="currentColor" /> : null}
+              <span>{l.startsWith("—") ? l.replace("—", "").trim() : l}</span>
             </p>
           ))}
+          <span className="letter-rule bottom" aria-hidden />
         </div>
         <button className="btn-pink" style={{ animationDelay: `${0.6 + FINALE.letter.length * 1.1}s` }} onClick={onClose}>
-          Back to the village ♥
+          <ArrowLeft size={16} strokeWidth={2.5} />
+          <span>Back to the village</span>
         </button>
       </div>
     </div>
