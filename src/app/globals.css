@@ -1168,15 +1168,20 @@ body {
 .dlg::before {
   content: "";
   position: absolute;
+  z-index: 0;
   inset: 0 0 auto 0;
   height: 4px;
   border-radius: 22px 22px 0 0;
-  background: linear-gradient(90deg, #ffc2d8, #ff7aa6 30%, #ffd36e 50%, #ff7aa6 70%, #ffc2d8);
+  /* starts just past the portrait (18px padding + 68px avatar) so the
+     rule never runs into her frame */
+  background: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff7aa6 40%, #ffd36e 52%, #ff7aa6 66%, #ffc2d8 100%);
 }
 .dlg.sorry::before {
-  background: linear-gradient(90deg, #ffc2d8, #ff8f9c 50%, #ffc2d8);
+  background: linear-gradient(90deg, transparent 0 84px, #ffc2d8 84px, #ff8f9c 52%, #ffc2d8 100%);
 }
 .dlg-head {
+  position: relative;
+  z-index: 2;
   gap: 14px;
   margin-top: -46px;
 }
