@@ -1,4 +1,4 @@
-import { mk, R, shade, outlined, pmap, disc, Cvs, Ctx } from "./px";
+import { mk, R, shade, outlined, pmap, disc, ell, Cvs, Ctx } from "./px";
 
 export type Dir = 0 | 1 | 2 | 3; // down, up, left, right
 export type Acc =
@@ -404,24 +404,154 @@ export function chickenSprite(brown: boolean, step: number): Cvs {
   });
 }
 
-export function catSprite(): Cvs {
-  return memo("cat", 12, 12, (g) => {
-    const rows = [
-      "..b...b...",
-      ".bbb.bbb..",
-      ".bbbbbbb..",
-      ".bkbbbkb..",
-      ".bbbpbbb..",
-      "..bbbbb...",
-      ".bbbbbbb..",
-      "bbbbbbbbb.",
-      "bbbbbbbbb.",
-      ".bbb.bbb..",
-    ];
-    pmap(g, rows, { b: "#e9923a", k: "#2b1b2e", p: "#ff8fa8" }, 1, 1);
-    R(g, "#fff1dc", 4, 8, 3, 2);
-    R(g, "#c9701f", 3, 3, 1, 1);
-    R(g, "#c9701f", 7, 3, 1, 1);
+export type CatBody = "fat" | "slim";
+
+export interface CatLook {
+  body: CatBody;
+  size?: "adult" | "kitten";
+  /** main coat */
+  fur: string;
+  /** second colour: patches, blaze, plume tip */
+  patch: string;
+  /** optional third colour (grey on a white cat, etc.) */
+  patch2?: string;
+  /** muzzle, chest and paws */
+  belly: string;
+  eye: string;
+}
+
+/**
+ * The village cats. `body: "fat"` gives a round, flat-faced, plume-tailed
+ * Persian; `"slim"` gives a narrow, pointy-eared street cat. Kittens reuse
+ * the same shapes at a smaller scale.
+ */
+export function catSprite(look: CatLook, frame = 0): Cvs {
+  const fat = look.body === "fat";
+  const k = look.size === "kitten" ? 0.6 : 1;
+  const bw = fat ? 27 : 18;
+  const bh = fat ? 22 : 18;
+  const w = Math.max(9, Math.round(bw * k));
+  const h = Math.max(9, Math.round(bh * k));
+  const key = `cat:${look.body}:${look.size ?? "adult"}:${look.fur}:${look.patch}:${look.patch2 ?? ""}:${frame}`;
+
+  return memo(key, w, h, (g) => {
+    const F = look.fur;
+    const D = shade(F, -0.24);
+    const P = look.patch;
+    const P2 = look.patch2 ?? P;
+    const M = look.belly;
+    const E = look.eye;
+
+    const sx = (v: number) => Math.round(v * k);
+    const sy = (v: number) => Math.round(v * k);
+    const blob = (cx: number, cy: number, rx: number, ry: number, col: string) =>
+      ell(g, col, sx(cx), sy(cy), Math.max(1, sx(rx)), Math.max(1, sy(ry)));
+    const rect = (col: string, x: number, y: number, rw: number, rh: number) =>
+      R(g, col, sx(x), sy(y), Math.max(1, sx(rw)), Math.max(1, sy(rh)));
+
+    const bob = frame;
+    const pink = "#ee8fae";
+
+    if (fat) {
+      // --- fluffy plume tail, curling up on the right -----------------
+      rect(D, 18.2, 13.4, 3.8, 2.8);
+      blob(21, 12 + bob, 2.6, 2.6, D);
+      blob(22, 9.6 + bob, 2.2, 2.4, F);
+      blob(22.6, 7.8 + bob, 1.6, 1.6, F);
+      blob(22.8, 6.9 + bob, 1, 1, P);
+
+      // --- wide, sitting body ------------------------------------------
+      blob(13, 14.4, 9, 5.4, D);
+      blob(13, 13.6, 8.2, 4.6, F);
+      // fluff tufts breaking up the silhouette
+      blob(4.8, 16.6, 2.2, 1.8, F);
+      blob(20.2, 16.8, 2.2, 1.6, F);
+      blob(21.4, 12.4, 2, 2, F);
+      // markings on the back
+      blob(17.6, 11.8, 3, 2.2, P2);
+      // white bib under the chin (small, so the body stays its own colour)
+      blob(8.2, 16.4, 3.6, 2.2, M);
+
+      // --- big round head, sitting on the body -------------------------
+      blob(8, 7.6 + bob, 6.4, 5.4, D);
+      blob(8, 7 + bob, 5.8, 4.8, F);
+      // flat, tufted Persian ears
+      rect(D, 2.2, 2.2 + bob, 2.8, 3);
+      rect(F, 2.7, 2.6 + bob, 1.6, 2);
+      rect(D, 9.8, 2.2 + bob, 2.8, 3);
+      rect(F, 10.3, 2.6 + bob, 1.6, 2);
+      rect(pink, 3.1, 2.8 + bob, 1, 1);
+      rect(pink, 10.7, 2.8 + bob, 1, 1);
+      // blaze down the forehead
+      blob(8, 4.4 + bob, 2.2, 1.3, P2);
+      // muzzle
+      blob(8, 10 + bob, 3.4, 2, M);
+      // eyes: round, with an iris, a pupil and a glint
+      blob(5.2, 6.9 + bob, 1.9, 1.9, "#fffdf6");
+      blob(10.8, 6.9 + bob, 1.9, 1.9, "#fffdf6");
+      blob(5.4, 7.1 + bob, 0.9, 1.1, E);
+      blob(10.6, 7.1 + bob, 0.9, 1.1, E);
+      rect("#2b1b2e", 5, 7 + bob, 1, 1);
+      rect("#2b1b2e", 10, 7 + bob, 1, 1);
+      rect("#ffffff", 4.4, 6.2 + bob, 1, 1);
+      rect("#ffffff", 10, 6.2 + bob, 1, 1);
+      // nose + little mouth
+      rect(pink, 7.5, 9.1 + bob, 1.5, 1);
+      rect(D, 7.2, 10.2 + bob, 1, 1);
+      rect(D, 8.8, 10.2 + bob, 1, 1);
+      // whisker freckles
+      rect(D, 4.4, 9.6 + bob, 1, 1);
+      rect(D, 11.6, 9.6 + bob, 1, 1);
+
+      // --- front paws ---------------------------------------------------
+      blob(6.6, 19.4, 2.4, 1.4, M);
+      blob(12.6, 19.4, 2.6, 1.4, M);
+      rect(D, 5.6, 20, 1, 1);
+      rect(D, 8, 20, 1, 1);
+      rect(D, 11.6, 20, 1, 1);
+    } else {
+      // --- slim tail ----------------------------------------------------
+      rect(F, 14, 9 + bob, 2, 1);
+      rect(D, 15.6, 6.6 + bob, 1.2, 3.4);
+      blob(16, 6 + bob, 1.2, 1.4, P);
+
+      // --- narrow body ---------------------------------------------------
+      blob(8, 12.4, 5, 4.6, D);
+      blob(8, 11.8, 4.4, 4, F);
+      blob(8, 13.6, 2.4, 2.4, M); // chest
+      rect(D, 6.4, 9.6 + bob, 3, 1);
+      rect(D, 6.4, 11.4 + bob, 2.4, 1);
+
+      // --- head ----------------------------------------------------------
+      blob(6, 5.6 + bob, 4.8, 4.4, D);
+      blob(6, 5.1 + bob, 4.2, 3.8, F);
+      // pointy ears
+      rect(D, 1.8, 1.2 + bob, 1.8, 2.8);
+      rect(F, 2.2, 1.6 + bob, 1, 2);
+      rect(D, 8.4, 1.2 + bob, 1.8, 2.8);
+      rect(F, 8.8, 1.6 + bob, 1, 2);
+      // muzzle
+      blob(6, 7.3 + bob, 2.8, 1.9, M);
+      blob(9.4, 8.6 + bob, 1.8, 1.4, P);
+      // eyes
+      blob(4.2, 5 + bob, 1.5, 1.5, "#fffdf6");
+      blob(7.8, 5 + bob, 1.5, 1.5, "#fffdf6");
+      blob(4.3, 5.2 + bob, 0.8, 0.9, E);
+      blob(7.7, 5.2 + bob, 0.8, 0.9, E);
+      rect("#ffffff", 3.6, 4.4 + bob, 1, 1);
+      rect("#ffffff", 7.2, 4.4 + bob, 1, 1);
+      // nose
+      rect(pink, 5.6, 6.4 + bob, 1.2, 1);
+
+      // --- legs -----------------------------------------------------------
+      rect(F, 5, 14.6, 1.6, 2.8);
+      rect(D, 5, 16.4, 1.6, 1.2);
+      rect(F, 9.4, 14.6, 1.6, 2.8);
+      rect(D, 9.4, 16.4, 1.6, 1.2);
+      // paw tips
+      rect(M, 5, 17, 1.6, 1);
+      rect(M, 9.4, 17, 1.6, 1);
+    }
   });
 }
 

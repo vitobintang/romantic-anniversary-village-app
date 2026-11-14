@@ -1,5 +1,5 @@
 import { buildWorld, World, WW, WH, PEN, HouseInst } from "./world";
-import { NPCS, NpcDef, PRINCESS_LOOK, PLAYER_START, Reaction, Topic, MEMORIES } from "./config";
+import { NPCS, NpcDef, PRINCESS_LOOK, PLAYER_START, Reaction, Topic, MEMORIES, CATS, CatDef } from "./config";
 import { drawChar, Dir, chickenSprite, catSprite, doveSprite, giftBoxSprite } from "./sprites";
 import { clamp } from "./px";
 import * as sfx from "./audio";
@@ -19,7 +19,7 @@ export interface DialogView {
 export interface UiState {
   phase: Phase;
   dialog: DialogView | null;
-  near: { kind: "house" | "fountain"; label: string } | null;
+  near: { kind: "house" | "fountain" | "cat"; label: string } | null;
   opened: string[];
   total: number;
   photo: string | null;
@@ -54,6 +54,20 @@ interface Npc {
   routeIdx: number;
   anim: Anim | null;
   jobT: number;
+}
+interface Cat {
+  def: CatDef;
+  x: number;
+  y: number;
+  homeX: number;
+  homeY: number;
+  dir: number;
+  step: number;
+  tx: number | null;
+  ty: number | null;
+  wait: number;
+  say: { text: string; t: number } | null;
+  purr: number;
 }
 interface Animal {
   kind: "chicken" | "cat";
@@ -122,6 +136,7 @@ export class Game {
   private player = { x: PLAYER_START.x, y: PLAYER_START.y, dir: 1 as Dir, walk: 0, moving: false };
   private npcs: Npc[] = [];
   private animals: Animal[] = [];
+  private cats: Cat[] = [];
   private parts: Particle[] = [];
   private petals: { x: number; y: number; s: number; sp: number; ph: number; c: string }[] = [];
   private keys = new Set<string>();
@@ -168,7 +183,22 @@ export class Game {
       [112, 240, true],
     ];
     for (const [x, y, b] of ch) this.animals.push({ kind: "chicken", x, y, dir: 2, tx: null, ty: null, wait: Math.random() * 2, step: 0, brown: b });
-    this.animals.push({ kind: "cat", x: 216, y: 620, dir: 2, tx: null, ty: null, wait: 0, step: 0, brown: false });
+    for (const def of CATS) {
+      this.cats.push({
+        def,
+        x: def.x,
+        y: def.y,
+        homeX: def.x,
+        homeY: def.y,
+        dir: 2,
+        step: 0,
+        tx: null,
+        ty: null,
+        wait: Math.random() * 2,
+        say: null,
+        purr: Math.random() * 2,
+      });
+    }
     for (let i = 0; i < 34; i++)
       this.petals.push({ x: Math.random(), y: Math.random(), s: 1.5 + Math.random() * 2, sp: 0.03 + Math.random() * 0.05, ph: Math.random() * 6, c: pick(["#ffb3cf", "#ff8fb7", "#ffd1e3", "#ffffff"]) });
     this.resize();
@@ -227,6 +257,16 @@ export class Game {
       this.ui.photo = id;
       sfx.chime();
       for (let i = 0; i < 14; i++) this.emit("heart", n.house.x + (Math.random() - 0.5) * 30, n.house.y - 20, (Math.random() - 0.5) * 30, -20 - Math.random() * 30, 1.6, 0, pick(["red", "pink", "gold"]), -4);
+      this.publish();
+    } else if (n.kind === "cat" && n.cat) {
+      const cat = n.cat;
+      const cry = cat.def.cries[Math.floor(Math.random() * cat.def.cries.length)];
+      cat.say = { text: cry, t: 2.8 };
+      cat.dir = cat.x > this.player.x ? 2 : 3;
+      sfx.blip(cat.def.look.size === "kitten" ? 880 : 640);
+      for (let i = 0; i < 7; i++) {
+        this.emit("heart", cat.x + (Math.random() - 0.5) * 12, cat.y - 12, (Math.random() - 0.5) * 22, -14 - Math.random() * 16, 1.2, 0, pick(["pink", "red"]), 0);
+      }
       this.publish();
     } else if (n.kind === "fountain") {
       if (this.ui.opened.length >= this.ui.total) {
@@ -524,6 +564,7 @@ export class Game {
 
     for (const n of this.npcs) this.updateNpc(n, dt);
     for (const a of this.animals) this.updateAnimal(a, dt);
+    this.updateCats(dt);
     this.updateParticles(dt);
     this.ambient(dt);
 
@@ -551,8 +592,15 @@ export class Game {
     this.updateCamera(dt);
   }
 
-  private findNear(): { kind: "house" | "fountain"; label: string; house?: HouseInst } | null {
+  private findNear(): { kind: "house" | "fountain" | "cat"; label: string; house?: HouseInst; cat?: Cat } | null {
     const p = this.player;
+    for (const c of this.cats) {
+      const r = c.def.look.size === "kitten" ? 17 : 22;
+      if (Math.hypot(p.x - c.x, p.y - c.y) < r) {
+        const name = c.def.look.size === "kitten" ? "the kitten" : c.def.name;
+        return { kind: "cat", label: `Say hello to ${name}`, cat: c };
+      }
+    }
     for (const h of this.world.houses) {
       if (!h.memory) continue;
       if (Math.hypot(p.x - h.zone.x, p.y - h.zone.y) < 22) {
@@ -724,12 +772,6 @@ export class Game {
   }
 
   private updateAnimal(a: Animal, dt: number) {
-    if (a.kind === "cat") {
-      const d = Math.hypot(a.x - this.player.x, a.y - this.player.y);
-      a.dir = this.player.x < a.x ? 2 : 3;
-      if (d < 26 && Math.random() < dt * 1.2) this.emit("heart", a.x, a.y - 14, (Math.random() - 0.5) * 8, -16, 1.2, 0, "pink", 0);
-      return;
-    }
     if (a.tx === null || a.ty === null) {
       a.wait -= dt;
       if (a.wait <= 0) {
@@ -752,6 +794,79 @@ export class Game {
     a.y += (dy / d) * sp;
     a.step += sp;
     if (Math.abs(dx) > 0.5) a.dir = dx < 0 ? 2 : 3;
+  }
+
+  private updateCats(dt: number) {
+    for (const c of this.cats) {
+      const kitten = c.def.look.size === "kitten";
+      const near = Math.hypot(c.x - this.player.x, c.y - this.player.y) < 62;
+
+      if (c.say) {
+        c.say.t -= dt;
+        if (c.say.t <= 0) c.say = null;
+      }
+
+      // look at the Princess when she comes close
+      if (near) c.dir = this.player.x < c.x ? 2 : 3;
+
+      const radius = kitten ? 9 : 20;
+      if (c.tx === null || c.ty === null) {
+        c.wait -= dt;
+        if (c.wait <= 0) {
+          c.tx = c.homeX + (Math.random() - 0.5) * radius * 2;
+          c.ty = c.homeY + (Math.random() - 0.5) * radius;
+          c.wait = 1.6 + Math.random() * 3.4;
+        }
+      } else {
+        const dx = c.tx - c.x;
+        const dy = c.ty - c.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 1.2) {
+          c.tx = null;
+          c.ty = null;
+        } else {
+          const sp = (kitten ? 9 : 6) * dt;
+          c.x += (dx / dist) * sp;
+          c.y += (dy / dist) * sp;
+          c.step += sp * 2.4;
+          if (Math.abs(dx) > 0.4) c.dir = dx < 0 ? 2 : 3;
+        }
+      }
+
+      // happy purring when the Princess is right next to it
+      if (near) {
+        c.purr -= dt;
+        if (c.purr <= 0) {
+          c.purr = 1.8 + Math.random() * 1.4;
+          this.emit("heart", c.x, c.y - 13, (Math.random() - 0.5) * 8, -13, 1.1, 0, "pink", 0);
+        }
+      }
+    }
+  }
+
+  private drawCat(g: CanvasRenderingContext2D, c: Cat, t: number) {
+    const kitten = c.def.look.size === "kitten";
+    const frame = Math.floor(c.step / 6) % 2;
+    const spr = catSprite(c.def.look, frame);
+    this.shadow(g, c.x, c.y, kitten ? 0.45 : 0.85, 0.24);
+
+    g.save();
+    g.translate(Math.round(c.x), Math.round(c.y));
+    if (c.dir === 3) g.scale(-1, 1);
+    g.drawImage(spr, -Math.round(spr.width / 2), -spr.height + 2);
+    g.restore();
+
+    // tail sway
+    const sway = Math.sin(t * 2.4 + c.homeX) * 1.5;
+    g.fillStyle = c.def.look.patch;
+    g.fillRect(Math.round(c.x - (kitten ? 4 : 7) + sway), Math.round(c.y - (kitten ? 5 : 7)), 1, 1);
+
+    if (c.say) {
+      const a = Math.min(1, c.say.t / 0.45);
+      this.tag(g, `${c.def.name}: ${c.say.text}`, c.x, c.y - spr.height - 6, a);
+    } else if (Math.hypot(c.x - this.player.x, c.y - this.player.y) < 62) {
+      this.tag(g, c.def.name, c.x, c.y - spr.height - 5, 0.9);
+    }
   }
 
   private updateParticles(dt: number) {
@@ -1061,25 +1176,12 @@ export class Game {
       });
     }
     for (const n of this.npcs) items.push({ y: n.y, f: () => this.drawNpc(g, n) });
+    for (const c of this.cats) items.push({ y: c.y, f: () => this.drawCat(g, c, t) });
     for (const a of this.animals) {
       items.push({
         y: a.y,
         f: () => {
-          if (a.kind === "cat") {
-            this.shadow(g, a.x, a.y, 0.8);
-            const spr = catSprite();
-            g.save();
-            g.translate(Math.round(a.x), Math.round(a.y));
-            if (a.dir === 3) g.scale(-1, 1);
-            g.drawImage(spr, -7, -14);
-            g.restore();
-            // tail
-            const w = Math.sin(t * 3) * 2;
-            g.fillStyle = "#e9923a";
-            const dirk = a.dir === 3 ? -1 : 1;
-            g.fillRect(Math.round(a.x + dirk * 5), Math.round(a.y - 4), 3 * dirk, 1);
-            g.fillRect(Math.round(a.x + dirk * 7), Math.round(a.y - 5 - w * 0.5), 1 * dirk, 2);
-          } else {
+          {
             this.shadow(g, a.x, a.y, 0.6);
             const spr = chickenSprite(a.brown, Math.floor(a.step / 3) % 2);
             g.save();

@@ -1057,3 +1057,395 @@ body {
     0 0 48px rgba(255, 120, 150, 0.45),
     0 2px 0 rgba(110, 40, 0, 0.28);
 }
+
+/* =====================================================================
+   Screen redesign — title card, dialogue paper, finale letter
+   ===================================================================== */
+.title-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 196, 224, 0.22), transparent 58%),
+    radial-gradient(circle at 50% 100%, rgba(255, 150, 190, 0.16), transparent 55%);
+}
+
+/* ---------------- title ---------------- */
+.title-card {
+  padding: 44px 26px 24px;
+  width: min(92vw, 404px);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #fffdf8 0%, #fff6ef 52%, #ffeef4 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 -14px 30px rgba(255, 206, 224, 0.35),
+    0 0 0 1px rgba(255, 186, 212, 0.75),
+    0 28px 60px rgba(28, 0, 40, 0.48);
+}
+.title-crest {
+  position: absolute;
+  top: -23px;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  margin-left: -23px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff2f8;
+  background: radial-gradient(circle at 34% 28%, #ffb0cd, #ef4f86 62%, #c22a60);
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -3px 6px rgba(120, 0, 50, 0.45),
+    0 0 0 4px #fffdf8,
+    0 0 0 5px rgba(255, 186, 212, 0.6),
+    0 12px 22px rgba(200, 30, 90, 0.32);
+}
+.title-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  font-weight: 800;
+  color: #b0527a;
+  white-space: nowrap;
+}
+.eyebrow-rule {
+  flex: 1 1 auto;
+  max-width: 42px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(176, 82, 122, 0.55), transparent);
+}
+.title-num {
+  font-size: clamp(84px, 24vw, 122px);
+  margin-top: 10px;
+  letter-spacing: -0.03em;
+}
+.title-sub {
+  font-size: 32px;
+  margin-top: -2px;
+  letter-spacing: 0.01em;
+}
+.title-divider {
+  width: 118px;
+  height: 9px;
+  margin: 10px auto 14px;
+  background:
+    radial-gradient(circle, rgba(217, 58, 112, 0.7) 0 1.6px, transparent 2px) center / 9px 9px no-repeat,
+    linear-gradient(90deg, transparent, rgba(176, 82, 122, 0.45), transparent) center / 100% 1px no-repeat;
+}
+.title-copy {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #6b3459;
+  margin: 0 6px 20px;
+}
+.title-note {
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #a97b9a;
+}
+
+/* ---------------- dialogue ---------------- */
+.dlg {
+  border: none;
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(255, 244, 236, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(255, 186, 212, 0.8),
+    0 22px 46px rgba(30, 0, 45, 0.48);
+}
+.dlg::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  border-radius: 22px 22px 0 0;
+  background: linear-gradient(90deg, #ffc2d8, #ff7aa6 30%, #ffd36e 50%, #ff7aa6 70%, #ffc2d8);
+}
+.dlg.sorry::before {
+  background: linear-gradient(90deg, #ffc2d8, #ff8f9c 50%, #ffc2d8);
+}
+.dlg-head {
+  gap: 14px;
+  margin-top: -46px;
+}
+.portrait-frame {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  border: 3px solid #fff;
+  background: linear-gradient(170deg, #ffe3ee, #ffc6dc);
+  box-shadow:
+    0 0 0 1px rgba(255, 150, 190, 0.7),
+    0 10px 20px rgba(120, 20, 80, 0.28);
+}
+.portrait {
+  width: 68px;
+  height: 68px;
+  margin-top: 8px;
+}
+.dlg-name {
+  padding: 8px 16px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #8e2c62, #6d1c4e);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 8px 18px rgba(70, 5, 45, 0.35);
+  margin-top: 30px;
+}
+.dlg-name b {
+  font-size: 17px;
+  letter-spacing: 0.01em;
+}
+.dlg-name span {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.dlg-text {
+  position: relative;
+  margin-top: 12px;
+  padding: 14px 15px 38px;
+  border-radius: 14px;
+  min-height: 96px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 25px, rgba(176, 120, 150, 0.13) 25px 26px),
+    rgba(255, 250, 244, 0.9);
+  border: 1px solid rgba(214, 158, 184, 0.35);
+  box-shadow: inset 0 1px 3px rgba(140, 80, 110, 0.08);
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #46243f;
+}
+.dlg-line {
+  margin: 0;
+}
+.caret {
+  width: 2px;
+  height: 17px;
+  border-radius: 1px;
+  vertical-align: -3px;
+  background: var(--rose-d);
+}
+.next {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: 1px solid rgba(217, 58, 112, 0.25);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-d);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(180, 60, 120, 0.14);
+  animation: bounceX 0.9s ease-in-out infinite;
+}
+.next:hover {
+  background: #fff;
+  border-color: rgba(217, 58, 112, 0.5);
+}
+.choices {
+  gap: 9px;
+  margin-top: 12px;
+}
+.choices-label {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: #a8618a;
+}
+.choice {
+  border: 1px solid rgba(255, 150, 190, 0.55);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #fffdfb;
+  box-shadow: 0 2px 0 rgba(214, 150, 180, 0.22);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 15.5px;
+}
+.choice i {
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ff9dc0, #ef5f92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 800;
+}
+.choice.exit {
+  border-color: rgba(214, 178, 108, 0.7);
+  background: #fffaf0;
+}
+.choice.exit i {
+  background: linear-gradient(180deg, #e8c372, #c9a24c);
+}
+
+/* ---------------- finale: the letter, on paper ---------------- */
+.finale {
+  background:
+    radial-gradient(ellipse at 50% 18%, #6d1c6b 0%, #2a0733 62%, #170320 100%);
+}
+.note-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 18px;
+}
+.note {
+  position: relative;
+  width: min(92vw, 452px);
+  max-height: 86dvh;
+  overflow: auto;
+  padding: 46px 28px 26px 34px;
+  border-radius: 3px;
+  color: #46303f;
+  transform: rotate(-0.55deg);
+  background:
+    repeating-linear-gradient(180deg, transparent 0 26px, rgba(126, 96, 148, 0.12) 26px 27px),
+    linear-gradient(180deg, #fffdf7 0%, #fdf4e6 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 26px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(120, 80, 40, 0.12);
+  animation: noteIn 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  scrollbar-width: thin;
+}
+.note::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 70px rgba(178, 132, 84, 0.18);
+}
+.note::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  width: 1px;
+  pointer-events: none;
+  background: rgba(214, 88, 108, 0.22);
+}
+.note-tape {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  width: 104px;
+  height: 26px;
+  margin-left: -52px;
+  transform: rotate(-2.5deg);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255, 240, 200, 0.9), rgba(246, 220, 168, 0.82));
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.note-head {
+  position: relative;
+  text-align: center;
+}
+.note-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a8694a;
+}
+.note-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+}
+.note h2 {
+  font-family: var(--font-script);
+  font-size: clamp(28px, 8vw, 36px);
+  line-height: 1.12;
+  margin: 8px 0 16px;
+  color: #8a2a5c;
+}
+.note-body p {
+  margin: 0 0 14px;
+  font-family: var(--font-serif);
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: #4a3040;
+  opacity: 0;
+  animation: fadeUp 0.9s both;
+}
+.note-body p.salutation {
+  font-style: italic;
+  color: #7d3a52;
+}
+.note-body p.signature {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 20px 0 6px;
+  font-family: var(--font-script);
+  font-size: 27px;
+  color: #b3255f;
+}
+.note-body p.signature svg {
+  color: #d93a70;
+}
+.note-foot {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+.note-seal {
+  position: absolute;
+  right: -13px;
+  bottom: -13px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffe8f2;
+  transform: rotate(8deg);
+  background: radial-gradient(circle at 32% 26%, #ff9dc0, #b3255f 62%, #7c1240);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(88, 0, 40, 0.6),
+    0 10px 22px rgba(0, 0, 0, 0.4);
+}
+@keyframes noteIn {
+  from {
+    opacity: 0;
+    transform: translateY(26px) rotate(-3deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(-0.55deg) scale(1);
+  }
+}

@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Music2,
   Package,
+  PawPrint,
   Plane,
   Sparkles,
   Volume2,
@@ -133,7 +134,15 @@ export default function GameApp() {
 
           {ui.near && !ui.dialog && !ui.photo && !ui.finale && (
             <button className="action" onClick={() => gameRef.current?.interact()}>
-              {ui.near.label.toLowerCase().includes("memory") ? <Gift size={18} /> : ui.near.label.toLowerCase().includes("talk") ? <MessageCircle size={18} /> : <ArrowRight size={18} />}
+              {ui.near.label.toLowerCase().includes("memory") ? (
+                <Gift size={18} />
+              ) : ui.near.label.toLowerCase().includes("hello") ? (
+                <PawPrint size={18} />
+              ) : ui.near.label.toLowerCase().includes("talk") ? (
+                <MessageCircle size={18} />
+              ) : (
+                <ArrowRight size={18} />
+              )}
               <span>{ui.near.label}</span>
             </button>
           )}
@@ -169,6 +178,7 @@ function TitleScreen({ ready, onStart }: { ready: boolean; onStart: () => void }
   );
   return (
     <div className="title">
+      <div className="title-glow" aria-hidden />
       <div className="floaters">
         {hearts.map((h, i) => (
           <span key={i} style={{ left: `${h.left}%`, animationDelay: `${h.delay}s`, animationDuration: `${h.dur}s` }}>
@@ -183,16 +193,20 @@ function TitleScreen({ ready, onStart }: { ready: boolean; onStart: () => void }
         ))}
       </div>
       <div className="title-card">
+        <div className="title-crest">
+          <Heart size={17} strokeWidth={0} fill="currentColor" />
+        </div>
         <div className="title-eyebrow">
-          <Sparkles size={12} strokeWidth={2.5} />
+          <span className="eyebrow-rule" />
           <span>A little village made with love</span>
-          <Sparkles size={12} strokeWidth={2.5} />
+          <span className="eyebrow-rule" />
         </div>
         <div className="title-num">
           <NumberFlow value={MONTHS} />
         </div>
         <div className="title-sub">Monthversary</div>
-        <p className="title-copy">For my Princess. Come visit Loveberry Village. Everyone has been waiting for you.</p>
+        <div className="title-divider" aria-hidden />
+        <p className="title-copy">For my Princess. Come visit Loveberry Village — everyone has been waiting for you.</p>
         <button className="title-btn" disabled={!ready} onClick={onStart}>
           <span>{ready ? "Enter the Village" : "Gathering petals…"}</span>
           <ArrowRight size={18} strokeWidth={2.75} />
@@ -272,13 +286,21 @@ function DialogBox({ d, onNext, onChoose }: { d: DialogView; onNext: () => void;
           </div>
         </div>
         <div className="dlg-text" onClick={click}>
-          {d.text.slice(0, n)}
-          {!done && <span className="caret" />}
+          <p className="dlg-line">
+            {d.text.slice(0, n)}
+            {!done && <span className="caret" />}
+          </p>
           {done && !d.choices && (
-            <span className="next">
-              Next
+            <button
+              className="next"
+              onClick={(e) => {
+                e.stopPropagation();
+                onNext();
+              }}
+            >
+              <span>Next</span>
               <ArrowRight size={13} strokeWidth={3} />
-            </span>
+            </button>
           )}
         </div>
         {d.choices && done && (
@@ -446,33 +468,45 @@ function Finale({ onClose }: { onClose: () => void }) {
   return (
     <div className="finale">
       <canvas ref={ref} className="finale-fx" />
-      <div className="finale-card">
-        <div className="finale-halo" aria-hidden />
-        <div className="finale-seal">
-          <Heart size={20} strokeWidth={0} fill="currentColor" />
-        </div>
-        <div className="finale-num">
-          <NumberFlow value={MONTHS} />
-        </div>
-        <h2>{FINALE.title}</h2>
-        <div className="letter">
-          <span className="letter-rule" aria-hidden />
-          {FINALE.letter.map((l, i) => (
-            <p
-              key={i}
-              className={l.startsWith("—") ? "signature" : l.endsWith(",") && l.split(" ").length <= 3 ? "salutation" : undefined}
-              style={{ animationDelay: `${0.6 + i * 1.1}s` }}
-            >
-              {l.startsWith("—") ? <Heart size={14} strokeWidth={0} fill="currentColor" /> : null}
-              <span>{l.startsWith("—") ? l.replace("—", "").trim() : l}</span>
-            </p>
-          ))}
-          <span className="letter-rule bottom" aria-hidden />
-        </div>
-        <button className="btn-pink" style={{ animationDelay: `${0.6 + FINALE.letter.length * 1.1}s` }} onClick={onClose}>
-          <ArrowLeft size={16} strokeWidth={2.5} />
-          <span>Back to the village</span>
-        </button>
+      <div className="note-wrap">
+        <article className="note">
+          <span className="note-tape" aria-hidden />
+          <header className="note-head">
+            <div className="note-kicker">
+              <span>Loveberry Village</span>
+              <span className="note-dot" />
+              <span>
+                <NumberFlow value={MONTHS} /> months
+              </span>
+            </div>
+            <h2>{FINALE.title}</h2>
+          </header>
+          <div className="note-body">
+            {FINALE.letter.map((l, i) => {
+              const signature = l.startsWith("—");
+              const salutation = !signature && l.endsWith(",") && l.split(" ").length <= 3;
+              return (
+                <p
+                  key={i}
+                  className={signature ? "signature" : salutation ? "salutation" : undefined}
+                  style={{ animationDelay: `${0.45 + i * 0.85}s` }}
+                >
+                  <span>{signature ? l.replace("—", "").trim() : l}</span>
+                  {signature && <Heart size={15} strokeWidth={0} fill="currentColor" />}
+                </p>
+              );
+            })}
+          </div>
+          <footer className="note-foot">
+            <button className="btn-pink" style={{ animationDelay: `${0.45 + FINALE.letter.length * 0.85}s` }} onClick={onClose}>
+              <ArrowLeft size={16} strokeWidth={2.5} />
+              <span>Back to the village</span>
+            </button>
+          </footer>
+          <div className="note-seal" aria-hidden>
+            <Heart size={18} strokeWidth={0} fill="currentColor" />
+          </div>
+        </article>
       </div>
     </div>
   );
