@@ -691,3 +691,369 @@ body {
     transform: translateX(4px);
   }
 }
+
+/* =====================================================================
+   UI polish — icon alignment, shadcn-flavoured buttons, prettier finale
+   ===================================================================== */
+.chip,
+.hint,
+.action,
+.title-btn,
+.title-eyebrow,
+.title-note,
+.btn-pink,
+.next,
+.choices-label,
+.choice,
+.photo-ribbon,
+.polaroid-tag,
+.signature {
+  display: inline-flex;
+  align-items: center;
+}
+.chip svg,
+.hint svg,
+.action svg,
+.title-btn svg,
+.title-eyebrow svg,
+.title-note svg,
+.btn-pink svg,
+.next svg,
+.choices-label svg,
+.choice svg,
+.photo-ribbon svg,
+.signature svg {
+  flex: none;
+  display: block;
+}
+.chip {
+  gap: 9px;
+}
+.chip-count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.chip.round {
+  transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.4), background 0.18s, border-color 0.18s;
+}
+.chip.round:hover {
+  transform: translateY(-1px) scale(1.05);
+  background: rgba(86, 34, 100, 0.72);
+  border-color: rgba(255, 214, 232, 0.85);
+}
+.chip.round:active {
+  transform: scale(0.95);
+}
+.hint {
+  display: inline-flex;
+  gap: 8px;
+  color: #6a2a52;
+}
+.hint svg {
+  color: #b0527a;
+}
+
+/* ---------- buttons ---------- */
+.title-btn,
+.btn-pink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background-image: linear-gradient(180deg, #ff9dc0 0%, #ff5d8f 52%, #e63a72 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 0 rgba(146, 8, 56, 0.35),
+    0 2px 4px rgba(70, 0, 30, 0.22),
+    0 10px 24px rgba(200, 30, 90, 0.38);
+  transition: transform 0.16s cubic-bezier(0.2, 0.9, 0.3, 1.4), box-shadow 0.2s, filter 0.2s;
+}
+.title-btn::after,
+.btn-pink::after {
+  content: "";
+  position: absolute;
+  inset: -20% -40%;
+  background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.5) 48%, transparent 62%);
+  transform: translateX(-130%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+.title-btn > *,
+.btn-pink > * {
+  position: relative;
+  z-index: 1;
+}
+.title-btn:not(:disabled):hover,
+.btn-pink:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(146, 8, 56, 0.35),
+    0 4px 8px rgba(70, 0, 30, 0.2),
+    0 16px 32px rgba(200, 30, 90, 0.44);
+}
+.title-btn:not(:disabled):hover::after,
+.btn-pink:hover::after {
+  transform: translateX(130%);
+}
+.title-btn:not(:disabled):active,
+.btn-pink:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow:
+    inset 0 2px 6px rgba(120, 0, 44, 0.4),
+    0 4px 12px rgba(200, 30, 90, 0.32);
+}
+.title-btn:focus-visible,
+.btn-pink:focus-visible,
+.action:focus-visible,
+.choice:focus-visible,
+.chip.round:focus-visible,
+.polaroid-close:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.95),
+    0 0 0 6px rgba(255, 122, 166, 0.55),
+    0 10px 24px rgba(200, 30, 90, 0.38);
+}
+.title-btn:disabled {
+  filter: grayscale(0.35) brightness(1.02);
+  cursor: progress;
+}
+
+/* action button (bottom-right) */
+.action {
+  display: inline-flex;
+  gap: 9px;
+  letter-spacing: 0.01em;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  background-image: linear-gradient(180deg, #ffa6c6 0%, #ff5d8f 55%, #e0356d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(146, 8, 56, 0.4),
+    0 0 0 6px rgba(255, 120, 170, 0.22),
+    0 14px 32px rgba(200, 30, 90, 0.48);
+}
+.action:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+.action:active {
+  transform: scale(0.96);
+}
+
+/* choice buttons */
+.choice {
+  transition: transform 0.14s cubic-bezier(0.2, 0.9, 0.3, 1.4), border-color 0.16s, background 0.16s, box-shadow 0.16s;
+  box-shadow: 0 1px 2px rgba(120, 20, 70, 0.07);
+}
+.choice:hover {
+  transform: translateY(-1px);
+  border-color: var(--rose);
+  background: #fff7fb;
+  box-shadow: 0 8px 18px rgba(200, 60, 120, 0.16);
+}
+.choice em {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 122, 166, 0.16);
+  color: var(--rose);
+}
+.next {
+  gap: 5px;
+  color: var(--rose);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: bounceX 1.2s ease-in-out infinite;
+}
+.choices-label {
+  gap: 6px;
+}
+
+/* ---------- title screen ---------- */
+.title-eyebrow {
+  justify-content: center;
+  gap: 8px;
+}
+.title-note {
+  justify-content: center;
+  gap: 6px;
+}
+.title-num {
+  display: block;
+}
+.title-num number-flow-react {
+  display: block;
+}
+
+/* ---------- polaroid ---------- */
+.polaroid-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(122, 42, 98, 0.16);
+  background: rgba(255, 255, 255, 0.72);
+  color: #7a2a62;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 0.16s, background 0.16s, color 0.16s;
+  z-index: 2;
+}
+.polaroid-close:hover {
+  transform: rotate(90deg) scale(1.06);
+  background: #fff;
+  color: #c02c63;
+}
+.polaroid-tag {
+  justify-content: center;
+  gap: 8px;
+}
+.tag-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+.photo-ribbon {
+  display: inline-flex;
+  justify-content: center;
+  gap: 7px;
+}
+.photo-fallback {
+  color: #b3376d;
+}
+.photo-fallback svg {
+  opacity: 0.75;
+}
+
+/* ---------- finale / letter ---------- */
+.finale-halo {
+  position: absolute;
+  inset: -30% -20%;
+  background: radial-gradient(circle at 50% 26%, rgba(255, 196, 224, 0.3), transparent 62%);
+  pointer-events: none;
+}
+.finale-seal {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 10px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffe6f0;
+  background: radial-gradient(circle at 32% 26%, #ff9dc0, #b3255f 62%, #7c1240 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.6),
+    inset 0 -4px 8px rgba(88, 0, 40, 0.6),
+    0 12px 26px rgba(150, 0, 66, 0.55);
+  animation: beat 2.8s ease-in-out infinite;
+}
+.letter {
+  position: relative;
+  margin: 6px 2px 20px;
+  padding: 18px 16px 14px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 248, 240, 0.14), rgba(255, 248, 240, 0.05));
+  border: 1px solid rgba(255, 214, 232, 0.24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 18px 44px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.letter-rule {
+  display: block;
+  height: 1px;
+  margin: 0 22px 16px;
+  background: linear-gradient(90deg, transparent, rgba(255, 214, 232, 0.55), transparent);
+}
+.letter-rule.bottom {
+  margin: 16px 22px 2px;
+}
+.letter p {
+  padding: 0 2px;
+}
+.letter p.salutation {
+  font-style: italic;
+  color: #ffe2ef;
+}
+.letter p.signature {
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-family: var(--font-script);
+  font-size: 26px;
+  line-height: 1.2;
+  color: #ffd1e3;
+  text-shadow: 0 0 18px rgba(255, 130, 180, 0.55);
+}
+.letter p.signature svg {
+  color: #ff7aa6;
+}
+.finale-card .btn-pink {
+  margin-top: 4px;
+}
+
+/* ---------- sonner toasts ---------- */
+[data-sonner-toast].village-toast {
+  width: max-content;
+  max-width: 86vw;
+  padding: 11px 16px !important;
+  border-radius: 16px !important;
+  border: 1.5px solid rgba(255, 214, 232, 0.75) !important;
+  background: linear-gradient(135deg, #ff7aa6, #ff5d8f 70%, #ef437a) !important;
+  color: #fff !important;
+  font-family: inherit !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 10px 28px rgba(200, 30, 90, 0.42) !important;
+}
+[data-sonner-toast].village-toast [data-icon] {
+  color: #fff;
+  margin-right: 2px;
+}
+[data-sonner-toast].village-toast [data-description] {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* NumberFlow paints its digits inside a shadow root, so `background-clip: text`
+   can't reach them. Use solid fills with layered shadows instead of the old
+   gradient-clipped text, or the numbers would render invisible. */
+.title-num {
+  background: none;
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+  color: #d93a70;
+  -webkit-text-fill-color: #d93a70;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.95),
+    0 7px 0 rgba(255, 190, 215, 0.5),
+    0 18px 28px rgba(217, 58, 112, 0.32);
+}
+.finale-num {
+  background: none;
+  background-clip: border-box;
+  -webkit-background-clip: border-box;
+  color: #ffd07a;
+  -webkit-text-fill-color: #ffd07a;
+  text-shadow:
+    0 0 22px rgba(255, 172, 92, 0.7),
+    0 0 48px rgba(255, 120, 150, 0.45),
+    0 2px 0 rgba(110, 40, 0, 0.28);
+}

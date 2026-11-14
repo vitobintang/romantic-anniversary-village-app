@@ -66,7 +66,7 @@ export const MEMORIES: Memory[] = [
     id: "nw",
     title: "Grey Roselle",
     tag: "Cardigan I",
-    caption: "The first box of the month. Grey, quiet, understated — and then you put it on and it became the prettiest thing in Loveberry. Some clothes are just lucky to be worn by you.",
+    caption: "The first box of the month. Grey, quiet, understated — and then you put it on and it became the prettiest thing in the world. Some clothes are just lucky to be worn by you.",
     photo: "/photos/memory-1.jpg",
     focus: "center 45%",
   },
@@ -106,7 +106,7 @@ export const MEMORIES: Memory[] = [
     id: "n",
     title: "Butter Yellow Valerie",
     tag: "Cardigan VI",
-    caption: "Not here yet — but already my favourite, because it's still travelling to you. When the yellow box finally lands on the doorstep, wear it once and let me say it out loud: you're the loveliest thing this month, cardigan or not. 💛📦",
+    caption: "Not here yet — but already my favourite, because it's still travelling to you. When the yellow box finally lands on the doorstep, wear it once and let me say it out loud: you're the loveliest thing this month, cardigan or not.",
     photo: "/photos/memory-6.jpg",
     status: "on-the-way",
   },
@@ -119,9 +119,9 @@ export const FINALE = {
     `${MONTHS} months ago my life got so much brighter. Every laugh, every hug, every silly little moment with you is my favourite thing in the world.`,
     "Thank you for being patient with me, for believing in me, and for loving me exactly as I am.",
     "This whole village is just a tiny piece of how much I adore you. I can't wait to build a thousand more memories with you.",
-    "Five cardigans on the shelf, one still on its way — and every single one of them is just an excuse to say it again: you're the prettiest thing in this village.",
+    "Five cardigans on the shelf, one still on its way — and every single one of them is just an excuse to say it again: you're the prettiest thing in the world.",
     "Forever yours,",
-    "— Your Prince 💖",
+    "— Your Dudut",
   ],
 };
 
@@ -186,11 +186,11 @@ export const NPCS: NpcDef[] = [
     behavior: "wander",
     facing: 0,
     voice: 330,
-    exit: "I'm ready to explore! 💖",
+    exit: "I'm ready to explore!",
     intro: [
       { text: "Hear ye, hear ye! Oh! P-Princess! You've arrived!", react: "gasp" },
       { text: "Welcome to Loveberry Village! Our Master, the Prince, has been planning this day for ages.", react: "bow" },
-      { text: `Today marks ${MONTHS} glorious months since the Prince and his Princess found each other! 💕`, react: "cheer" },
+      { text: `Today marks ${MONTHS} glorious months since the Prince and his Princess found each other!`, react: "cheer" },
       { text: "The whole village has been preparing... though, ahem, a few of us are still hanging the last decorations. Please forgive the mess!", react: "shake" },
       { text: "Master left a little memory inside each house for you. Walk up to a door and open it, Princess!", react: "jump" },
     ],
@@ -208,7 +208,7 @@ export const NPCS: NpcDef[] = [
       {
         label: "Where is the Prince?",
         react: "blush",
-        reply: ["Master? Hehe... he's always with you in spirit, Princess. He built every corner of this village with you in his heart. 💗"],
+        reply: ["Master? Hehe... he's always with you in spirit, Princess. He built every corner of this village with you in his heart."],
       },
       {
         label: "Is all this for me?",
@@ -219,7 +219,7 @@ export const NPCS: NpcDef[] = [
         ],
       },
     ],
-    farewell: "Splendid! Off you go, Princess! Master's memories are waiting behind every door. 💌",
+    farewell: "Splendid! Off you go, Princess! Master's memories are waiting behind every door.",
   },
   {
     id: "rosa",
@@ -239,9 +239,9 @@ export const NPCS: NpcDef[] = [
     topics: [
       { label: "What smells so good?", react: "jump", reply: ["Strawberry heart tarts! Master tasted twelve recipes to pick your favourite. He's very serious about sweets, our Prince."] },
       { label: "Any secrets about the Prince?", react: "blush", reply: ["He asked me for the sweetest recipe in the world. I said, 'Master, just think of her.' He turned red as a tomato!"] },
-      { label: "Can I have a tart?", react: "dance", reply: ["Of course, Princess! *twirls* Here's one made with sixteen spoonfuls of love. 🍓"] },
+      { label: "Can I have a tart?", react: "dance", reply: ["Of course, Princess! *twirls* Here's one made with sixteen spoonfuls of love."] },
     ],
-    farewell: "Come back for cake anytime, Princess! 🎂",
+    farewell: "Come back for cake anytime, Princess!",
   },
   {
     id: "gus",
@@ -263,7 +263,7 @@ export const NPCS: NpcDef[] = [
       { label: "Did the Prince really help?", react: "laugh", reply: ["Ha! He got mud all over his royal boots and grinned ear to ear. Never seen a happier prince!"] },
       { label: "Thank you, Gus", react: "salute", reply: ["Anything for you and Master, Princess! Long live love!"] },
     ],
-    farewell: "Take care, Princess! Watch for thorns! 🌹",
+    farewell: "Take care, Princess! Watch for thorns!",
   },
   {
     id: "bram",
@@ -285,7 +285,7 @@ export const NPCS: NpcDef[] = [
       { label: "Are you scared of anything?", react: "shake", reply: ["N-nothing! ...except Rosa when the tarts run out. And disappointing Master. Not that he'd ever show it."] },
       { label: "Tell me about the Prince", react: "cry", reply: ["Master is the bravest, kindest soul in the realm. And when he talks about you, Princess... I tear up inside this helmet. Sniff."] },
     ],
-    farewell: "Stay safe, Princess! I'll guard your happiness! ⚔️",
+    farewell: "Stay safe, Princess! I'll guard your happiness!",
   },
   {
     id: "lily",
@@ -307,7 +307,7 @@ export const NPCS: NpcDef[] = [
       { label: "What's your favourite colour?", react: "spin", reply: ["Pink! Because it's the colour of you and Master's love story! Wheee!"] },
       { label: "Do you know a secret?", react: "blush", reply: ["Shhh... Master practiced his love letter on me forty times. I cried at every single one!"] },
     ],
-    farewell: "Bye bye, Princess! Don't forget to smell the roses! 🌸",
+    farewell: "Bye bye, Princess! Don't forget to smell the roses!",
   },
   {
     id: "tobin",
@@ -325,11 +325,11 @@ export const NPCS: NpcDef[] = [
       "Behold, the Princess! Master's love story is the best ballad I know!",
     ],
     topics: [
-      { label: "Sing me a song!", react: "dance", reply: ["♪ Sixteen moons and still they stay, hand in hand, come what may. ♪", "♪ A prince, a princess, a love so true... and the whole village sings for you! ♪"] },
+      { label: "Sing me a song!", react: "dance", reply: [" Sixteen moons and still they stay, hand in hand, come what may.", " A prince, a princess, a love so true... and the whole village sings for you!"] },
       { label: "Did Master write a song?", react: "gasp", reply: ["He tried! Forty verses. Thirty-nine of them were just your name. It was my favourite song ever."] },
-      { label: "Play something sad", react: "cry", reply: ["♪ Oh the days when they were apart... ♪ Sniff... no, no, too sad. Happy endings only, Princess!"] },
+      { label: "Play something sad", react: "cry", reply: [" Oh the days when they were apart... Sniff... no, no, too sad. Happy endings only, Princess!"] },
     ],
-    farewell: "May your heart always have a melody, Princess! 🎶",
+    farewell: "May your heart always have a melody, Princess!",
   },
   {
     id: "milo",
@@ -352,7 +352,7 @@ export const NPCS: NpcDef[] = [
       { label: "Do you like the Prince?", react: "cheer", reply: ["He's my hero! He taught me how to skip stones. He says you taught him how to love."] },
       { label: "Race me!", react: "spin", reply: ["Ready... set... *spins* ...I win! Wheee! I'm too dizzy to run!"] },
     ],
-    farewell: "Bye Princess! Come play again! 🎈",
+    farewell: "Bye Princess! Come play again!",
   },
   {
     id: "may",
@@ -375,7 +375,7 @@ export const NPCS: NpcDef[] = [
       { label: "Remember the Prince as a kid?", react: "laugh", reply: ["Ha! Master was a very shy little prince. Now he talks about you for hours! Oh, my heart."] },
       { label: "You're so sweet, Granny", react: "blush", reply: ["Oh stop it, dearie, you'll make an old lady blush! ...Have a sugar cookie."] },
     ],
-    farewell: "Take care, my dear Princess. Love is the best magic. 💜",
+    farewell: "Take care, my dear Princess. Love is the best magic.",
   },
   {
     id: "hob",
@@ -400,7 +400,7 @@ export const NPCS: NpcDef[] = [
       { label: "Can I help hammer?", react: "shake", reply: ["A Princess hammering nails?! Master would never forgive me! Please, enjoy the village!"] },
       { label: "Take your time", react: "bow", reply: ["Bless you, Princess. I promise it'll be perfect before sunset. For you and Master!"] },
     ],
-    farewell: "Back to work! Sorry again, Princess! 🔨",
+    farewell: "Back to work! Sorry again, Princess!",
   },
   {
     id: "wren",
@@ -425,7 +425,7 @@ export const NPCS: NpcDef[] = [
       { label: "Careful on that ladder!", react: "gasp", reply: ["Eep! I'm fine, I'm fine! ...Maybe hold the ladder? No, no, a Princess shouldn't!"] },
       { label: "No need to apologise", react: "blush", reply: ["You're far too kind, Princess. Master chose well. Truly."] },
     ],
-    farewell: "Almost done! Enjoy the village, Princess! 🧵",
+    farewell: "Almost done! Enjoy the village, Princess!",
   },
   {
     id: "dex",
@@ -450,7 +450,7 @@ export const NPCS: NpcDef[] = [
       { label: "You're a wonderful artist", react: "cheer", reply: ["Me?! A masterpiece for the Princess! I'll paint a thousand hearts for you!"] },
       { label: "What colour is that heart?", react: "gasp", reply: ["Rose-red mixed with sunset gold! The exact shade of your smile, Princess."] },
     ],
-    farewell: "Back to the brushes! Sorry about the mess, Princess! 🎨",
+    farewell: "Back to the brushes! Sorry about the mess, Princess!",
   },
   {
     id: "tam",
@@ -479,6 +479,6 @@ export const NPCS: NpcDef[] = [
       { label: "Need a hand?", react: "jump", reply: ["No no! I've got it! ...Maybe? Hup! See? Totally fine!"] },
       { label: "You're doing great!", react: "cry", reply: ["Sniff... nobody ever says that to apprentices. Thank you, Princess! I'll work extra hard!"] },
     ],
-    farewell: "Gotta run! Sorry, Princess! 📦",
+    farewell: "Gotta run! Sorry, Princess!",
   },
 ];
